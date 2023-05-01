@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CadaverController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\RackController;
+use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -31,9 +35,44 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::match(['GET', 'POST'], 'corpses', [AdminController::class, 'corpses'])->name('corpses');
-    Route::match(['GET', 'POST'], 'admit', [AdminController::class, 'admit'])->name('admit');
-    Route::match(['GET', 'POST'], 'release', [AdminController::class, 'release'])->name('release');
+
+    // Cadaver
+    Route::match(['GET', 'POST'], '/corpses', [CadaverController::class, 'index'])->name('corpses');
+    Route::get('/get_corpses', [CadaverController::class, 'get_corpses'])->name('get_corpses');
+    Route::get('/get_corpse', [CadaverController::class, 'get_corpse'])->name('get_corpse');
+    Route::get('/get_num_of_days', [CadaverController::class, 'get_num_of_days'])->name('get_num_of_days');
+    Route::get('/add_days', [CadaverController::class, 'add_days'])->name('add_days');
+    Route::post('/update_admission', [CadaverController::class, 'update_admission'])->name('update_admission');
+    Route::match(['GET', 'POST'], '/corpses/admit', [CadaverController::class, 'admit'])->name('admit');
+    Route::match(['GET', 'POST'], '/corpse/release', [CadaverController::class, 'release'])->name('release');
+    Route::match(['GET', 'POST'], '/corpse/update_before_release', [CadaverController::class, 'update_before_release'])->name('update_before_release');
+
+    // Racks
+    Route::match(['GET', 'POST'], '/racks', [RackController::class, 'racks'])->name('racks');
+    Route::get('/get_racks', [RackController::class, 'get_racks'])->name('get_racks');
+    Route::get('/get_rack', [RackController::class, 'get_rack'])->name('get_rack');
+    Route::delete('/delete_rack', [RackController::class, 'delete_rack'])->name('delete_rack');
+    Route::put('/rack_edit', [RackController::class, 'rack_edit'])->name('rack_edit');
+    
+    // Documents
+    Route::match(['GET', 'POST'], '/documents', [DocumentController::class, 'documents'])->name('documents');
+    Route::get('/get_documents', [DocumentController::class, 'get_documents'])->name('get_documents');
+    Route::get('/get_document', [DocumentController::class, 'get_document'])->name('get_document');
+    Route::delete('/delete_document', [DocumentController::class, 'delete_document'])->name('delete_document');
+    Route::put('/document_edit', [DocumentController::class, 'document_edit'])->name('document_edit');
+    
+    // Services
+    Route::match(['GET', 'POST'], '/services', [ServicesController::class, 'services'])->name('services');
+    Route::get('/get_services', [ServicesController::class, 'get_services'])->name('get_services');
+    Route::get('/get_service', [ServicesController::class, 'get_service'])->name('get_service');
+    Route::delete('/delete_service', [ServicesController::class, 'delete_service'])->name('delete_service');
+    Route::put('/service_edit', [ServicesController::class, 'service_edit'])->name('service_edit');
+    
+    // payment
+    Route::post('/with_payment', [CadaverController::class, 'with_payment'])->name('with_payment');
+    Route::get('/without_payment', [CadaverController::class, 'without_payment'])->name('without_payment');
+
+
     
     Route::post('/billing_import', [BillingImportController::class, 'import'])->name('billing_import');
     Route::post('/payment_import', [PaymentImportController::class, 'import'])->name('payment_import');
@@ -53,10 +92,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('/view_period', [AuditPeriodController::class, 'view_period'])->name('view_period');
     Route::match(['GET', 'POST'], '/airlines', [AirlineController::class, 'airlines'])->name('airlines');
     Route::post('/airline_import', [AirlineController::class, 'airline_import'])->name('airline_import');
-    Route::get('/get_airlines', [AirlineController::class, 'get_airlines'])->name('get_airlines');
-    Route::delete('/delete_airline', [AirlineController::class, 'delete_airline'])->name('delete_airline');
     Route::get('/get_airline', [AirlineController::class, 'get_airline'])->name('get_airline');
-    Route::put('/airline_edit', [AirlineController::class, 'airline_edit'])->name('airline_edit');
 
     
     Route::match(['GET', 'POST'], 'users', [AuthController::class, 'users'])->name('users');

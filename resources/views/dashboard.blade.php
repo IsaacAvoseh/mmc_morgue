@@ -19,7 +19,7 @@
 
                         <div class="info-box-content">
                             <span class="info-box-text">In Morgue</span>
-                            <span class="info-box-number">{{ $billing_count ?? 0 }}</span>
+                            <span class="info-box-number">{{ $in_morgue ?? 0 }}</span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -28,7 +28,7 @@
             </div>
             <!-- /.col -->
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('payments') }}">
+                <a style="color: inherit" href="{{ route('racks') }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-success">
                             <i class="fas fa-money-check"></i>
@@ -36,7 +36,7 @@
 
                         <div class="info-box-content">
                             <span class="info-box-text">Available Rack</span>
-                            <span class="info-box-number">{{ $payment_count ?? 0 }}</span>
+                            <span class="info-box-number">{{ $available_rack_count ?? 0 }}</span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -47,12 +47,12 @@
 
             <!-- /.col -->
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('generate_report') }}">
+                <a style="color: inherit" href="{{ route('racks') }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-warning"><i class="fas fa-chalkboard-teacher"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Used Rack</span>
-                            <span class="info-box-number"><sub>10</sub> </span>
+                            <span class="info-box-number"><sub>{{$used_rack_count?? 0}}</sub> </span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -63,12 +63,12 @@
 
             <!-- /.col -->
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('generate_report') }}">
+                <a style="color: inherit" href="{{ route('racks') }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-secondary"><i class="fas fa-chalkboard-teacher"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Total Rack</span>
-                            <span class="info-box-number"><sub>60</sub> </span>
+                            <span class="info-box-number">{{ $rack_count?? 0 }} </span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -193,6 +193,7 @@
 </div>
 <!-- /.content -->
 
+  
 <script>
     function showUpload() {
         if ($('#show_upload').attr('hidden')) {

@@ -51,18 +51,18 @@
                 <li class="nav-item d-none d-sm-inline-block">
                     <a href="#" class="nav-link">{{ Auth::user()->name ?? 'Admin' }}</a>
                 </li>
-                <li class="nav-item d-none d-sm-inline-block">
+                {{-- <li class="nav-item d-none d-sm-inline-block">
                     <a href="#" class="nav-link btn btn-primary text-white btn-sm rounded"> <i class=" fas fa-folder-plus fa-1x"></i>  Admit</a>
-                </li>
+                </li> --}}
              
             
             </ul>
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                   <li class="nav-item d-none d-sm-inline-block">
+                   {{-- <li class="nav-item d-none d-sm-inline-block">
                     <a href="{{ route('corpses') }}" class="nav-link btn btn-success text-white btn-sm rounded"><i class=" fas fa-folder-minus"></i>  Release</a>
-                </li>
+                </li> --}}
                 <!-- Navbar Search -->
                 <li class="nav-item">
                     <a class="nav-link" href="#" role="button">
@@ -125,21 +125,40 @@
 
                         <li class="nav-item">
                             <a href="{{ route('admit') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/billings'? 'active': '' }}">
+                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/corpses/admit'? 'active': '' }}">
                                
                                 <i class="nav-icon fas fa-file-invoice"></i>
                                 <p>
-                                    Billings
+                                    Admit
                                 </p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('payments') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/payments'? 'active': '' }}">
-                                <i class="nav-icon fas fa-money-check"></i>
+                            <a href="{{ route('racks') }}"
+                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/racks'? 'active': '' }}">
+                                <i class="nav-icon fas fa-truck-loading"></i>
                                 <p>
-                                    Payments
+                                    Racks
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('services') }}"
+                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/services'? 'active': '' }}">
+                                <i class="nav-icon fas fa-poll-h"></i>
+                                <p>
+                                    Services
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('documents') }}"
+                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/documents'? 'active': '' }}">
+                                <i class="nav-icon fas fa-folder-open"></i>
+                                <p>
+                                    Documents
                                 </p>
                             </a>
                         </li>
@@ -237,15 +256,13 @@
 
     <!-- jQuery -->
     <script src="/plugins/jquery/jquery.min.js"></script>
-     <script>
-        $('#change_session').on("change", function() {
-            $('#form').submit();
-        });
-    </script>
     <!-- Bootstrap -->
     <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- Toastr -->
     <script src="/plugins/toastr/toastr.min.js"></script>
+    <!-- jQuery -->
+    <!-- SweetAlert2 -->
+    <script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- DataTables  & Plugins -->
     <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -259,7 +276,7 @@
     <script src="/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
     <script src="/plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-    <script src="/plugins/chart.js/Chart.min.js"></script>
+      <script src="/plugins/chart.js/Chart.min.js"></script>
     <script src="/dist/js/pages/dashboard3.js"></script>
     <!-- AdminLTE -->
     <script src="/dist/js/adminlte.js"></script>
