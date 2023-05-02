@@ -2,7 +2,7 @@
 
 
 @section('content')
-@section('title', 'Corpse - FILE & PAYMENT')
+@section('title', 'Corpse - UPDATE PAYMENT')
 <!-- Main content -->
 <div class="content">
     <div class="container-fluid">
@@ -16,7 +16,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="row justify-content-center">
-                            <p class="h5">UPDATE: FILE UPLOAD & PAYMENT</p>
+                            <p class="h5">UPDATE PAYMENT</p>
                         </div>
                         {{-- lodaing spinner --}}
                         <div class="overlay-wrapper hidden" id="overlay-wrapper">
@@ -33,59 +33,9 @@
                                 class="form-control datetimepicker-input" placeholder="Name of Deceased" readonly>
                         </div>
 
-                        {{-- FIle Upload --}}
-                        @if ($file_message != 'no')
-                            <div class="modal-body" id="admission_form2" {{ $file_message == 'no' ? 'hidden' : '' }}>
-                                {{-- lodaing spinner --}}
-                                <div class="overlay-wrapper hidden" id="overlay-wrapper2">
-                                    <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
-                                    </div>
-                                </div>
-                                {{-- end loading spinner --}}
-                                <form enctype="multipart/form-data" id="form2">
-                                    @csrf
-                                    <input type="hidden" value="{{ $data->id }}" name="admission_id"
-                                        id="admission_id2">
-                                    {{-- <input type="hidden" name="admission_id" id="admission_id2"> --}}
-                                    <p class="">Please Upload the following files</p>
-                                    <a onclick="showPrev" class="btn btn-default mb-4"> <i class="fas fa-file-alt"></i>
-                                        FILE UPLOAD
-                                    </a>
-                                    <div class="row">
-                                        @forelse ($files as $key => $file)
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>{{ $file->name ?? 'File' }}:</label>
-                                                    <div class="input-group date" id="reservationdate"
-                                                        data-target-input="nearest">
-                                                        <input type="file" name="document_{{ $key + 1 }}"
-                                                            class="form-control datetimepicker-input"
-                                                            {{ $file->required == 'yes' ? 'required' : '' }} />
-                                                        <input type="hidden" value="{{ $file->id }}">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @empty
-                                            <p class="text-danger">No files to upload for now, please continue...</p>
-                                        @endforelse
-                                        <input type="hidden" name="filename" value="{{ $file->name ?? 'No Name' }}">
-                                        <div class="col-md-12">
-                                            <div class="modal-footer justify-content-between">
-                                                <p></p>
-                                                <button type="button" onclick="submitFileForm()"
-                                                    class="btn btn-primary w-25">Upload & Continue</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        @endif
-                        <hr>
-                        <hr>
-                        <hr>
                         {{-- Payment --}}
-                        @if ($payment_message != 'no')
-                            <div class="modal-body" id="admission_form3" {{ $payment_message == 'no' ? 'hidden' : '' }}>
+      
+                            <div class="modal-body" id="admission_form3" >
                                 {{-- lodaing spinner --}}
                                 <div class="overlay-wrapper hidden" id="overlay-wrapper3">
                                     <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
@@ -137,7 +87,7 @@
                                                                         class="form-control text-center unit-fee"
                                                                         name="unit_fee[]"
                                                                         id="{{ $fee->name == 'Daily Fee' ? 'daily' : 'na' }}"
-                                                                        value="{{ $fee->name == 'Embalmment' ? '1' : '0' }}"
+                                                                        value="0"
                                                                         readonly />
                                                                     <button
                                                                         class="btn btn-outline-success increment-btn"
@@ -168,8 +118,8 @@
                                                     <div class="form-group">
                                                         <label>FROM:</label>
                                                         <div class="input-group date" data-target-input="nearest">
-                                                            <input type="date" name="date_from" id="date_from"
-                                                                value="{{ $data->date_received }}"
+                                                            <input type="date" id="date_from"
+                                                                value="{{ $data->date_to }}"
                                                                 class="form-control datetimepicker-input"
                                                                 data-target="#reservationdate" required readonly />
                                                         </div>
@@ -239,7 +189,7 @@
                                 </form>
 
                             </div>
-                        @endif
+                       
                         <style>
                             .my-toast-class {
                                 font-size: 14px;
@@ -279,20 +229,6 @@
         timer: 2000
     });
 
-    // $(window).on('beforeunload', function() {
-    //     return 'Are you sure you want to leave?';
-    // });
-
-    $(document).on('change', 'input[type="file"]', function() {
-        var input = $(this);
-        var fileName = input.val().split('\\').pop();
-        var hiddenInput = input.closest('.form-group').find('input[type="hidden"]');
-        if (fileName) {
-            hiddenInput.attr('name', 'document_id[]');
-        } else {
-            hiddenInput.removeAttr('name');
-        }
-    });
 
     document.addEventListener("DOMContentLoaded", function(event) {
         $('.fee-checkbox').prop('checked', true);
@@ -305,7 +241,7 @@
         })
         setTimeout(() => {
             document.getElementById('date_to').valueAsDate = new Date();
-            $('#date_to').trigger('change')
+            $('#date_to').focus().trigger('change')
         }, 3000);
     });
 
@@ -313,189 +249,8 @@
         $('.card').find('#overlay-wrapper').css('display', 'block');
     }
 
-    // show main forrm
-    function showPrev() {
-        $('#admission_form').attr('hidden', false);
-        $('#admission_form2').attr('hidden', true);
-    }
-
-    // Show with_payment form
-    function showPaymentForm() {
-        $('#admission_form').attr('hidden', true);
-        $('#admission_form2').attr('hidden', true);
-        $('#admission_form3').attr('hidden', false);
-    }
-
-    // Show files form
-    function showFileForm() {
-        $('#admission_form').attr('hidden', true);
-        $('#admission_form2').attr('hidden', false);
-        $('#admission_form3').attr('hidden', true);
-    }
-
-
-    // submit form
-    function submitForm() {
-        // $("#submit_button").click(function(){
-        var allFilled = true;
-        $('#admission_form input[required]').each(function() {
-            if ($(this).val() == '' || $(this).val() == null) {
-                allFilled = false;
-                // return false;
-                $(this).css('border-color', 'red');
-                $(this).next('.error-message').text('This field is required.');
-            }
-        });
-        if (allFilled) {
-            // All required fields are filled
-            console.log('fofof111')
-            $('.card').find('#overlay-wrapper1').css('display', 'block');
-            // $("#admission_form").find('form').submit();
-            event.preventDefault();
-            var formData = new FormData($('#form')[0]);
-            console.log('fofof')
-            $.ajax({
-                url: "{{ route('admit') }}",
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    console.log(response);
-                    $('.card').find('#overlay-wrapper1').css('display', 'none');
-                    Swal.fire({
-                        title: `Successfull !!`,
-                        text: `${response.success?? 'Data Saved Successfully!'}`,
-                        icon: 'success',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'OK!'
-                    });
-                    $('#admission_form').attr('hidden', true);
-                    $('#admission_form2').attr('hidden', false);
-                    $('#admission_form').find('#admission_id').val(response?.data.id);
-                    $('#admission_form2').find('#admission_id2').val(response?.data.id);
-                    $('#admission_form3').find('#admission_id3').val(response?.data.id);
-
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(XMLHttpRequest);
-                    if (XMLHttpRequest.responseJSON.error) {
-                        Swal.fire(
-                            'Error !',
-                            `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
-                            'error'
-                        )
-                    } else {
-                        $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: value[0],
-                            });
-                        });
-                    }
-                    $('.card').find('#overlay-wrapper1').css('display', 'none');
-
-                }
-            });
-            return true;
-        } else {
-            // Some required fields are not filled
-            Swal.fire({
-                title: `Please fill all required input`,
-                text: "Input with red outline are required!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Back!'
-            });
-            return false;
-        }
-
-    }
-
-    // submit file form 
-    function submitFileForm() {
-        // $("#submit_button").click(function(){
-        var allFilled = true;
-        $('#admission_form2 input[required]').each(function() {
-            console.log($(this).val())
-            if ($(this).val() == '' || $(this).val() == null) {
-                allFilled = false;
-                // return false;
-                $(this).css('border-color', 'red');
-                $(this).next('.error-message').text('This field is required.');
-            }
-        });
-        if (allFilled) {
-            // All required fields are filled
-            $('.card').find('#overlay-wrapper2').css('display', 'block');
-            event.preventDefault();
-            var formData = new FormData($('#form2')[0]);
-            console.log('fofof', formData)
-            $.ajax({
-                url: "{{ route('update_admission') }}",
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    console.log(response);
-                    $('.card').find('#overlay-wrapper2').css('display', 'none');
-                    Swal.fire({
-                        title: `Successfull !!`,
-                        text: `${response.success?? 'Files Saved Successfully!'}`,
-                        icon: 'success',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'OK!'
-                    });
-                    $('#admission_form').attr('hidden', true);
-                    $('#admission_form2').attr('hidden', true);
-                    $('#admission_form3').attr('hidden', false);
-                    // $('#admission_form').find('#admission_id').val(response?.data.id);
-                    // $('#admission_form2').find('#admission_id2').val(response?.data.id);
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(XMLHttpRequest);
-                    if (XMLHttpRequest.responseJSON.error) {
-                        Swal.fire(
-                            'Error !',
-                            `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
-                            'error'
-                        )
-                    } else {
-                        $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: value[0],
-                            });
-                        });
-                    }
-                    $('.card').find('#overlay-wrapper2').css('display', 'none');
-
-                }
-            });
-            return true;
-        } else {
-            // Some required fields are not filled
-            Swal.fire({
-                title: `Please upload all required files`,
-                text: "Input with red outline are required!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Back!'
-            });
-            return false;
-        }
-
-    }
 
     // submit with with_payment
-    // submit form
     function submitWithPayment() {
         // $("#submit_button").click(function(){
         var allFilled = true;
@@ -796,6 +551,7 @@
 
         // Create a table to display the receipt
         var table = '<table>' +
+            ' <caption>Payment Update</caption>'+
             '<thead>' +
             `<tr> ${receiptNumber} </tr>` +
             '<tr>' +

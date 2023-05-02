@@ -46,6 +46,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::match(['GET', 'POST'], '/corpses/admit', [CadaverController::class, 'admit'])->name('admit');
     Route::match(['GET', 'POST'], '/corpse/release', [CadaverController::class, 'release'])->name('release');
     Route::match(['GET', 'POST'], '/corpse/update_before_release', [CadaverController::class, 'update_before_release'])->name('update_before_release');
+    Route::get('/release_list', [CadaverController::class, 'release_list'])->name('release_list');
+    Route::get('/get_release_list', [CadaverController::class, 'get_release_list'])->name('get_release_list');
 
     // Racks
     Route::match(['GET', 'POST'], '/racks', [RackController::class, 'racks'])->name('racks');
@@ -71,6 +73,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     // payment
     Route::post('/with_payment', [CadaverController::class, 'with_payment'])->name('with_payment');
     Route::get('/without_payment', [CadaverController::class, 'without_payment'])->name('without_payment');
+    Route::match(['GET', 'POST'],'/update_payment', [CadaverController::class, 'update_payment'])->name('update_payment');
 
 
     

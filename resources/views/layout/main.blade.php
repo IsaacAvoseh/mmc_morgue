@@ -133,6 +133,17 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('release_list') }}"
+                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/release_list'? 'active': '' }}">
+        
+                                <i class="nav-icon  fas fa-sign-out-alt"></i>
+                            
+                                <p>
+                                    Released
+                                </p>
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a href="{{ route('racks') }}"
@@ -153,6 +164,7 @@
                                 </p>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{ route('documents') }}"
                                 class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/documents'? 'active': '' }}">

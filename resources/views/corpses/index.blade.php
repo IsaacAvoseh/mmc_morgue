@@ -77,233 +77,6 @@
                     <!-- /.modal-dialog -->
                 </div>
 
-                {{-- Relaese modal --}}
-
-                <div class="modal fade" id="release_modal">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title">Release Corpse</h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                {{-- Loadin Spinner --}}
-                                {{-- <div class="overlay-wrapper hidden" id="overlay-wrapper">
-                                    <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
-                                    </div>
-                                </div> --}}
-                                {{-- end loading spinner --}}
-
-                                <form action="{{ route('release') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="id" id="id">
-
-                                    <div class="form-group">
-                                        <label>Name of Deceased:</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="text" name="name" id="name"
-                                                value="{{ old('name') }}" class="form-control datetimepicker-input"
-                                                placeholder="Name of Deceased" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Date Admitted:</label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="date" name="date_admit" id="date_admit"
-                                                        value="{{ old('date_admit') }}"
-                                                        class="form-control datetimepicker-input"
-                                                        placeholder="Name of Deceased" required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Date Discharge:<span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="date" name="date_discharged" id="date_discharged"
-                                                        value="{{ old('date_discharged') }}"
-                                                        class="form-control datetimepicker-input"
-                                                        placeholder="Name of Deceased" required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                     <div class="form-group">
-                                            <label>Address of Deceased:</label>
-                                            <div class="input-group date" id="reservationdate"
-                                                data-target-input="nearest">
-                                                <input type="text" name="address" id="address" value="{{ old('address') }}"
-                                                    class="form-control datetimepicker-input"
-                                                    placeholder="Address of Deceased" required>
-                                            </div>
-                                    </div>
-
-                                      <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Age of Deceased:</label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="number" name="age" id="age"
-                                                        value="{{ old('age') }}"
-                                                        class="form-control datetimepicker-input"
-                                                        placeholder="76" required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Date of Death:</label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="date" name="date" id="date"
-                                                        value="{{ old('date') }}"
-                                                        class="form-control datetimepicker-input"
-                                                         required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                      <div class="row">
-                                        <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label>Name of Collector:<span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="text" name="collector" id="collector"
-                                                        value="{{ old('collector') }}"
-                                                        class="form-control datetimepicker-input"
-                                                        placeholder="John Doe" required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Relationship:<span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="text" name="relation" id="relation"
-                                                        value="{{ old('relation') }}"
-                                                        class="form-control datetimepicker-input"
-                                                         required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                      <div class="row">
-                                        <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label>Address of Collector: <span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="text" name="collector_address" id="collector_address"
-                                                        value="{{ old('collector_address') }}"
-                                                        class="form-control datetimepicker-input"
-                                                         required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Phone: <span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="text" name="collector_phone" id="collector_phone"
-                                                        value="{{ old('collector_phone') }}"
-                                                        class="form-control datetimepicker-input"
-                                                         required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                      <div class="row">
-                                        <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label>Interment Address:<span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="text" name="interment_address" id="interment_address"
-                                                        value="{{ old('interment_address') }}"
-                                                        class="form-control datetimepicker-input"
-                                                         required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>LGA: <span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="text" name="interment_lga" id="interment_lga"
-                                                        value="{{ old('interment_lga') }}"
-                                                        class="form-control datetimepicker-input"
-                                                         required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                      <div class="row">
-                                        <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label>Drivers Name:<span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="text" name="driver_name" id="driver_name"
-                                                        value="{{ old('driver_name') }}"
-                                                        class="form-control datetimepicker-input"
-                                                         required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Vehicle Number:<span class="badge bg-danger">****</span></label>
-                                                <div class="input-group date" id="reservationdate"
-                                                    data-target-input="nearest">
-                                                    <input type="text" name="vehicle_number" id="vehicle_number"
-                                                        value="{{ old('vehicle_number') }}"
-                                                        class="form-control datetimepicker-input"
-                                                         required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                        
-
-                                    <div class="modal-footer justify-content-between">
-                                        <button type="button" class="btn btn-default"
-                                            data-dismiss="modal">Close</button>
-                                        <button type="button" onclick="airline_edit()"
-                                            class="btn btn-primary w-25">Submit</button>
-                                    </div>
-                                </form>
-                            </div>
-
-                        </div>
-                        <!-- /.modal-content -->
-                    </div>
-                    <!-- /.modal-dialog -->
-                </div>
-
-                {{-- End of realse modal --}}
-                <!-- /.modal-dialog -->
                 <div class="card">
                     <div class="card-header">
                         <div class="row justify-content-between">
@@ -311,10 +84,6 @@
                                 <i class="fa fa-plus"></i>
                                 Admit
                             </a>
-
-
-                            <a onclick="get_airline(3)" class="btn btn-success text-white btn-sm rounded"><i
-                                    class=" fas fa-folder-minus"></i> Release</a>
                         </div>
                         {{-- lodaing spinner --}}
                         <div class="overlay-wrapper hidden" id="overlay-wrapper">
@@ -331,7 +100,7 @@
                                 <tr>
                                     <th>S/N</th>
                                     <th>Name</th>
-                                    <th>Date</th>
+                                    <th>Date of Death</th>
                                     <th>Age</th>
                                     <th>Sex</th>
                                     <th>Relation</th>
@@ -383,13 +152,14 @@
                 },
                 columns: [{
                         data: 'id',
+                        orderable: false
 
                     },
                     {
                         data: 'name'
                     },
                     {
-                        data: 'date'
+                        data: 'date_of_death'
                     },
                     {
                         data: 'age'
@@ -398,26 +168,16 @@
                         data: 'sex'
                     },
                     {
-                        data: 'relation'
+                        data: 'relation',
+                        orderable: false
                     },
                     {
-                        data: 'action'
+                        data: 'action',
+                        orderable: false
                     },
 
                 ],
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2')
-                .DataTable({
-                    "paging": true,
-                    "lengthChange": false,
-                    "searching": false,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                    "severSide": true,
-                    "processing": true,
-                });
 
         });
 

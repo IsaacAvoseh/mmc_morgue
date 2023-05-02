@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Release extends Model
 {
     use HasFactory;
+    protected $guarded = [];
+
+    public function corpse(){
+        return $this->belongsTo(Corpse::class);
+    }
 }

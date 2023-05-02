@@ -1037,11 +1037,11 @@
 
         // receipt no
          // Generate a random 6-digit number
-  const randomNumber = Math.floor(Math.random() * 900000) + 100000;
-  // Get the current timestamp in milliseconds
-  const timestamp = Date.now();
-  // Combine the random number and timestamp to create the receipt number
-  const receiptNumber = `#REC-${randomNumber}-${timestamp}`;
+        const randomNumber = Math.floor(Math.random() * 900000) + 100000;
+        // Get the current timestamp in milliseconds
+        const timestamp = Date.now();
+        // Combine the random number and timestamp to create the receipt number
+        const receiptNumber = `#REC-${randomNumber}-${timestamp}`;
 
         // Create a table to display the receipt
         var table = '<table>' +

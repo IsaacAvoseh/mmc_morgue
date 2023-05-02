@@ -7,6 +7,7 @@ use App\Models\Document;
 use App\Models\FileUpload;
 use App\Models\Payment;
 use App\Models\Rack;
+use App\Models\Release;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -28,19 +29,19 @@ class CadaverController extends Controller
             $request->validate([
                 'name' => 'required',
                 'rack_id' => 'required'
-            ],['rack_id.required' => 'No available rack or non selected']);
+            ], ['rack_id.required' => 'No available rack or non selected']);
             $data = $request->except('admission_id');
-           
+
             $data['user_id'] = Auth::user()->id;
             try {
                 $rack = Rack::find($request->rack_id);
-               if($rack->status != 'available'){
+                if ($rack->status != 'available') {
                     return response()->json(['error' => 'Selected rack is not available'], 500);
-               }else{
+                } else {
                     $rack->update([
                         'status' => 'used'
                     ]);
-               }
+                }
                 if ($request->admission_id) {
                     $saved = Corpse::find($request->admission_id)->update($data);
                     $saved = Corpse::find($request->admission_id);
@@ -48,7 +49,7 @@ class CadaverController extends Controller
                     $admit = new Corpse();
                     $saved = $admit->create($data);
                 }
-               
+
                 return response()->json(['success' => 'Added Successfully', 'data' => $saved], 200);
                 // return redirect()->route('corpses')->with('success', 'Added Successfully');
             } catch (\Throwable $th) {
@@ -61,13 +62,14 @@ class CadaverController extends Controller
         $files = Document::latest()->get();
         $fees = Service::latest()->get();
         $racks = Rack::where('status', 'available')->get();
-        return view('corpses.admit',['files' => $files, 'fees' => $fees, 'racks' => $racks]);
+        return view('corpses.admit', ['files' => $files, 'fees' => $fees, 'racks' => $racks]);
     }
 
-    public function get_num_of_days(Request $request){
+    public function get_num_of_days(Request $request)
+    {
         $date_from = Carbon::parse($request->date_from);
         $date_to = Carbon::parse($request->date_to);
-        if($date_to < $date_from){
+        if ($date_to < $date_from) {
             return response()->json(['error' => 'Start Date is greater than end date'], 500);
         }
         $number_of_days = $date_to->diffInDays($date_from);
@@ -75,7 +77,8 @@ class CadaverController extends Controller
         return response()->json(['success' => 'Success', 'days' => $number_of_days], 200);
     }
 
-    public function add_days(Request $request){
+    public function add_days(Request $request)
+    {
         // Retrieve the date_from and days values from the request
         $date_from = $request->input('date_from');
         $days = $request->input('days');
@@ -99,19 +102,19 @@ class CadaverController extends Controller
         // dd($request->all());
         if ($update) {
             // check if the request contains files
-            if ($request->hasFile('document_1') || $request->hasFile('document_2') || $request->hasFile('document_3') || $request->hasFile('document_4') ) {
-                $data = $request->except(['filename','_token', 'admission_id', 'document_id']);
+            if ($request->hasFile('document_1') || $request->hasFile('document_2') || $request->hasFile('document_3') || $request->hasFile('document_4')) {
+                $data = $request->except(['filename', '_token', 'admission_id', 'document_id']);
                 // get the admission_id parameter from the request
                 $admissionId = $request->input('admission_id');
                 // create a folder for the files based on the admission_id
                 $folderName = 'admission_' . $admissionId;
-                
-                try{
+
+                try {
                     // loop through the files in the request
                     foreach ($data as $key => $file) {
                         // create a unique filename for the file
                         $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-                        
+
                         // resize the image or keep the file as is
                         if (in_array($file->getClientOriginalExtension(), ['png', 'jpg', 'jpeg'])) {
                             // resize the image using the Intervention Image library
@@ -131,7 +134,7 @@ class CadaverController extends Controller
                         $fileModel->corpse_id = $admissionId;
                         $fileModel->filename = $filename;
                         $fileModel->user_id = auth()->user()->id;
-                        $fileModel->document_id = $request->document_id[(int)str_replace('document_', '',$key) -1];
+                        $fileModel->document_id = $request->document_id[(int)str_replace('document_', '', $key) - 1];
                         // dd($fileModel);
                         $fileModel->path = $folderName . '/' . $filename;
                         $fileModel->save();
@@ -139,9 +142,9 @@ class CadaverController extends Controller
                     // return a success response
                     return response()->json(['success' => 'Files uploaded successfully.'], 201);
                 } catch (\Exception $e) {
-                 return response()->json(['error', 'Somthing went wrong1'], 500);
-                 }   
-            }else{
+                    return response()->json(['error', 'Somthing went wrong1'], 500);
+                }
+            } else {
                 // return an error response if no files were found in the request
                 return response()->json(['error' => 'No files were found in the request.'], 500);
             }
@@ -150,67 +153,94 @@ class CadaverController extends Controller
         }
     }
 
-    public function with_payment(Request $request){
+    public function with_payment(Request $request)
+    {
 
-        if($request->isMethod('POST')){
+        if ($request->isMethod('POST')) {
             $request->validate([
                 'admission_id' => 'required',
-                'date_from' => 'required',
+                // 'date_from' => 'required',
                 'date_to' => 'required',
                 'total_amount' => 'required',
                 'no_of_days' => 'required',
                 'mode' => 'required',
-            ],['mode.required' => 'Please select a payment mode', 'admission_id.required' => 'Error !']);
+            ], ['mode.required' => 'Please select a payment mode', 'admission_id.required' => 'Error !']);
 
-            $dateFrom = Carbon::parse($request->date_from);
-            $dateTo = Carbon::parse($request->date_to);
-            $noOfDays = $request->no_of_days;
+           if($request->date_from){
+                $dateFrom = Carbon::parse($request->date_from);
+                $dateTo = Carbon::parse($request->date_to);
+                $noOfDays = $request->no_of_days;
+                $daysDiff = $dateTo->diffInDays($dateFrom);
+                // dd($daysDiff);
 
-            $daysDiff = $dateTo->diffInDays($dateFrom);
-            // dd($daysDiff);
+                if ($daysDiff != $noOfDays) {
+                    return response()->json(['error' => 'Start and End date selected does not match number of days. Please check your input'], 500);
+                }
+           }
 
-            if ($daysDiff != $noOfDays) {
-                return response()->json(['error' => 'Start and End date selected does not match number of days. Please check your input'], 500);
-            }
             $corpse = Corpse::find($request->admission_id);
 
-            try{
+            try {
                 $corpse->update([
-                    'date_from' => $request->date_from, 
-                    'date_to' => $request->date_to, 
-                    'amount' => $request->total_amount, 
-                    'no_of_days' => $request->no_of_days, 
+                    'date_from' => $request->date_from,
+                    'date_to' => $request->date_to,
+                    'amount' => $corpse->amount + $request->total_amount,
+                    'no_of_days' => $corpse->no_of_days + $request->no_of_days,
                     'paid' => 'yes'
                 ]);
-            $unit = count($request->unit_fee);
-            for ($i = 0; $i < $unit; $i++) {
-                $pay = new Payment();
-                $pay->qty = $request->unit_fee[$i];
-                $pay->service_id = $request->fee[$i];
-                $pay->price = $request->price[$i];
-                $pay->status = 'success';
-                $pay->mode = $request->mode;
-                $pay->corpse_id = $request->admission_id;
-                $pay->user_id = auth()->user()->id;
-                $pay->save();
-            }
-            // if($request->wantsJson()){
+                $unit = count($request->unit_fee);
+                for ($i = 0; $i < $unit; $i++) {
+                    $pay = new Payment();
+                    $pay->qty = $request->unit_fee[$i];
+                    $pay->service_id = $request->fee[$i];
+                    $pay->price = $request->price[$i];
+                    $pay->status = 'success';
+                    $pay->mode = $request->mode;
+                    $pay->corpse_id = $request->admission_id;
+                    $pay->user_id = auth()->user()->id;
+                    $pay->save();
+                }
+                // if($request->wantsJson()){
                 return response()->json(['success' => 'Payment updated Successfully.'], 201);
-            // }else{
+                // }else{
                 return redirect()->route('corpses')->with('success', 'Payment updated Successfully');
                 // }
             } catch (\Throwable $th) {
                 if ($request->wantsJson()) {
-                    return response()->json(['error' => 'An error occurred, please try again later.'],500);
+                    return response()->json(['error' => 'An error occurred, please try again later.'], 500);
                 } else {
+                    return response()->json(['error' => 'An error occurred, please try again later.'], 500);
                     return redirect()->route('corpses')->with('error', 'An error occurred, please try again later');
                 }
             }
         }
-
     }
 
-    public function without_payment(){
+    public function update_payment(Request $request){
+        // dd($request->all());
+        if ($request->id) {
+            //   Check payment
+            $corpse = Corpse::find(base64_decode($request->id));
+            $payment = DB::table('payments')->where('corpse_id', $corpse->id)->where('status', 'success')->sum(DB::raw('price * qty'));
+          
+            $release = $payment == $corpse->amount & $payment != 0 & $corpse->amount ? 'yes' : 'no';
+            $release1 = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 ? 'yes' : 'no';
+
+            $fees = Service::latest()->get();
+
+            return view('corpses.update_payment', [
+                'fees' => $fees,
+                'data' => $corpse,
+                'release' => $release,
+                'payment_message' => $release1 == 'no' ? 'You need to make payment before releasing this corpse.' : 'no',
+            ]);
+        } else {
+            return back()->withErrors('Something went wrong!');
+        }
+    }
+
+    public function without_payment()
+    {
         return redirect()->route('corpses')->with('success', 'Success! Please remember to make payment later');
     }
 
@@ -233,12 +263,13 @@ class CadaverController extends Controller
         $searchValue = $search_arr['value']; // Search value
 
         // Total records
-        $totalRecords = Corpse::select('count(*) as allcount')->count();
-        $totalRecordswithFilter = Corpse::select('count(*) as allcount')->where('name', 'like', '%' . $searchValue . '%')->count();
+        $totalRecords = Corpse::select('count(*) as allcount')->where('status', 'admitted')->count();
+        $totalRecordswithFilter = Corpse::select('count(*) as allcount')->where('status', 'admitted')->where('name', 'like', '%' . $searchValue . '%')->count();
 
         // Fetch records
-        $records = Corpse::orderBy($columnName, $columnSortOrder)
+        $records = Corpse::orderBy($columnName?? 'created_at', 'desc')
             ->where('name', 'like', '%' . $searchValue . '%')
+            ->where('status', 'admitted')
             ->skip($start)
             ->take($rowperpage)
             ->get();
@@ -251,19 +282,18 @@ class CadaverController extends Controller
 
             $id = $record->id;
             $name = $record->name;
-            $required = ucfirst($record->required);
-            $added = $record->created_at->format('d/m/Y');
+            $added = $record->date_of_death;
             $age = $record->age;
             $sex = $record->sex;
             $relation = $record->family_rep1_name ?? $record->family_rep2_name;
 
             $data_arr[] = array(
-                "id" => $key + 1,
+                "id" => ($start / $rowperpage) * $rowperpage + $key + 1,
                 "name" => $name,
                 "relation" => $relation,
                 "sex" => $sex,
                 "age" => $age,
-                "date" => $added,
+                "date_of_death" => $added,
                 "action" => '<div class="d-flex justify-content-center">
                                             <a class="btn btn-primary m-2" href=' . $view_route . '?id=' . base64_encode($id) . '> <i class="fa fa-eye"></i> View Details</a>
                                             <a class="btn btn-success m-2" href=' . $release_route . '?id=' . base64_encode($id) . '> <i class="fa fa-sign-out-alt"></i> Release</a>
@@ -293,9 +323,10 @@ class CadaverController extends Controller
     }
 
 
-    public function release(Request $request){
+    public function release(Request $request)
+    {
         if ($request->id) {
-        //   Check payment
+            //   Check payment
             $corpse = Corpse::find(base64_decode($request->id));
             $payment = DB::table('payments')->where('corpse_id', $corpse->id)->where('status', 'success')->sum(DB::raw('price * qty'));
 
@@ -308,8 +339,8 @@ class CadaverController extends Controller
             // Get the IDs of the uploaded files that match the required files
             $uploadedFileIds = $uploadedFiles->pluck('id')->toArray();
             $matchingFileIds = FileUpload::whereIn('id', $uploadedFileIds)
-            ->whereIn('document_id', $documentIds)
-            ->pluck('document_id')->toArray();
+                ->whereIn('document_id', $documentIds)
+                ->pluck('document_id')->toArray();
             // Get the IDs of the required files that have not been uploaded
             $missingFileIds = array_diff($documentIds->toArray(), $matchingFileIds);
             // Get the names of the missing documents
@@ -322,31 +353,173 @@ class CadaverController extends Controller
                 // All required files have been uploaded
             }
 
-            $release = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 & $file_message == 'no' ? 'yes':'no';
-            $release1 = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 ? 'yes':'no';
-            // dd($release);
-            return view('corpses.release',
-             [
-              'data' => $corpse, 
-              'release' => $release, 
-              'file_message' => $file_message,
-              'payment_message' => $release1 == 'no' ? 'You need to make payment before releasing this corpse.': 'no', 
-            ]);
-        } 
+            $due_today = 0;
+            $embalmment_fee = Service::where('name', 'Embalmment')->pluck('price')[0];
+            $daily_fee = Service::where('name', 'Daily Fee')->pluck('price')[0];
+            $date_to = Carbon::parse($corpse->date_to);
+
+            $days_diff = $date_to->diffInDays(now());
+            // dd($days_diff);
+            if($days_diff > 0){
+                // $due_today = ($daily_fee*$days_diff) + $embalmment_fee;
+                $due_today = ($daily_fee*$days_diff);
+            }
+
+            // dd($corpse->date_to, $days_diff, $due_today);
+
+            $release = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 & $file_message == 'no' & $due_today == 0 ? 'yes' : 'no';
+            $release1 = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0  & $due_today == 0 ? 'yes' : 'no';
+            // dd($release1);
+            return view(
+                'corpses.release',
+                [
+                    'data' => $corpse,
+                    'release' => $release,
+                    'file_message' => $file_message,
+                    'payment_message' => $release1 == 'no' ? 'You need to make payment or pay due fees before releasing this corpse.' : 'no',
+                    'due_today' => $due_today,
+                ]
+            );
+        }
         // else {
         //     return back()->withErrors('Something went wrong!');
         // }
 
         // handle release form
-        if($request->isMethod('POST')){
-            dd($request->all());
+        if ($request->isMethod('POST')) {
+            // dd($request->all());
             $request->validate([
                 'name' => 'required',
+                'corpse_id' => 'required',
             ]);
+
+            $data =  $request->except(['_token', 'rack_id', 'name', 'date_admit', 'address', 'age', 'date']);
+            try {
+                $release = new Release();
+                $corpse = Corpse::find($request->corpse_id);
+                $rack = Rack::find($request->rack_id);
+
+                // update corpse status
+                // if ($corpse->status != 'admitted') {
+                //     return back()->with('error', 'An error occurred, Please try again');
+                // } else {
+                $corpse->update([
+                    'status' => 'released'
+                ]);
+                // }
+
+                // update rack status
+                // if ($rack->status != 'used') {
+                //     return back()->with('error', 'An error occurred, Please try again');
+                // } else {
+                $rack->update([
+                    'status' => 'available'
+                ]);
+                // }
+                $saved = $release->create($data);
+                return response()->json(['success' => 'Released Successfully', 'data' => $saved], 200);
+            } catch (\Throwable $th) {
+                return response()->json(['error' => 'An error occurred, Please try again', 'error_data' => $th], 500);
+            }
         }
     }
 
-    public function update_before_release(Request $request){
+    public function release_list(Request $request)
+    {
+        return view('corpses.release_list');
+    }
+
+    public function get_release_list(Request $request)
+    {
+        // dd($request->all());
+        $draw = $request->get('draw');
+        $start = $request->get("start");
+        $rowperpage = $request->get("length"); // Rows display per page
+
+        $columnIndex_arr = $request->get('order');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+
+        // $columnIndex = $columnIndex_arr[0]['column']; // Column index
+        // $columnName = $columnName_arr[$columnIndex]['data']; // Column name
+        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        $searchValue = $search_arr['value']; // Search value
+
+        // Total records
+        $totalRecords = Release::with('corpse')
+            ->whereHas('corpse', function ($query) use ($searchValue) {
+                $query->where('name', 'like', '%' . $searchValue . '%');
+            })
+            ->count();
+        $totalRecordswithFilter = Release::with('corpse')
+            ->whereHas('corpse', function ($query) use ($searchValue) {
+                $query->where('name', 'like', '%' . $searchValue . '%');
+            })
+            ->count();
+
+        // Fetch records
+        $records = Release::with('corpse')
+            ->whereHas('corpse', function ($query) use ($searchValue) {
+                $query->where('name', 'like', '%' . $searchValue . '%');
+            })
+            ->orderByDesc('created_at')
+            ->skip($start)
+            ->take($rowperpage)
+            ->get();
+
+        $data_arr = array();
+        $view_route = route('get_corpse');
+        $release_route = route('release');
+        foreach ($records as $key => $record) {
+
+            $id = $record->id;
+            $name = $record->corpse->name;
+            $required = ucfirst($record->required);
+            $date_discharged = $record->date_discharged;
+            $sex = $record->corpse->sex;
+            $collector = $record->collector;
+            $relationship = $record->relationship;
+            $collector_phone = $record->collector_phone;
+            $collector_address = $record->collector_address;
+            $interment_address = $record->interment_address;
+            $interment_lga = $record->interment_lga;
+            $driver_name = $record->driver_name;
+            $vehicle_number = $record->vehicle_number;
+
+            $data_arr[] = array(
+                "id" => ($start / $rowperpage) * $rowperpage + $key + 1,
+                "name" => $name,
+                "sex" => $sex,
+                "date_discharged" => $date_discharged,
+                "collector" => $collector,
+                "relationship" => $relationship,
+                "collector_phone" => $collector_phone,
+                "collector_address" => $collector_address,
+                "interment_address" => $interment_address,
+                "interment_lga" => $interment_lga,
+                "driver_name" => $driver_name,
+                "vehicle_number" => $vehicle_number,
+                "action" => '<div class="d-flex justify-content-center">
+                                            <a class="btn btn-primary m-2" href=' . $view_route . '?id=' . base64_encode($id) . '> <i class="fa fa-eye"></i> View Details</a>
+                                            <a class="btn btn-success m-2" href=' . $release_route . '?id=' . base64_encode($id) . '> <i class="fa fa-sign-out-alt"></i> Release</a>
+                                 </div>',
+            );
+        }
+
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordswithFilter,
+            "aaData" => $data_arr
+        );
+
+        echo json_encode($response);
+        exit;
+    }
+
+    public function update_before_release(Request $request)
+    {
         // dd($request->all());
         if ($request->id) {
             //   Check payment
@@ -361,8 +534,8 @@ class CadaverController extends Controller
             // Get the IDs of the uploaded files that match the required files
             $uploadedFileIds = $uploadedFiles->pluck('id')->toArray();
             $matchingFileIds = FileUpload::whereIn('id', $uploadedFileIds)
-            ->whereIn('document_id', $documentIds)
-            ->pluck('document_id')->toArray();
+                ->whereIn('document_id', $documentIds)
+                ->pluck('document_id')->toArray();
             // Get the IDs of the required files that have not been uploaded
             $missingFileIds = array_diff($documentIds->toArray(), $matchingFileIds);
             // Get the names of the missing documents
@@ -389,11 +562,10 @@ class CadaverController extends Controller
                 'data' => $corpse,
                 'release' => $release,
                 'file_message' => $file_message,
-                'payment_message' => $release1 == 'no' ? 'You need to make payment before releasing this corpse.' : 'no', 
+                'payment_message' => $release1 == 'no' ? 'You need to make payment before releasing this corpse.' : 'no',
             ]);
         } else {
             return back()->withErrors('Something went wrong!');
         }
     }
-
 }
