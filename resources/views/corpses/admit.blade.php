@@ -131,8 +131,6 @@
                                             </div>
                                         </div>
 
-
-
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -142,7 +140,7 @@
                                                         <input type="date" name="date_received" min="0"
                                                             value="{{ old('date_received') }}"
                                                             class="form-control datetimepicker-input"
-                                                            data-target="#reservationdate">
+                                                            data-target="#reservationdate" required>
                                                     </div>
                                                 </div>
                                             </div>

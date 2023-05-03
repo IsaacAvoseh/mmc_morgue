@@ -26,6 +26,7 @@ Route::get('/', function () {
     }
     return view('auth.login');
 });
+Route::get('/chart-data', [AdminController::class, 'getChartData']);
 
 Route::controller(AuthController::class)->group(function () {
     Route::match(['GET', 'POST'], '/login', [AuthController::class, 'login'])->name('login');

@@ -100,10 +100,11 @@
                                 <tr>
                                     <th>S/N</th>
                                     <th>Name</th>
-                                    <th>Date of Death</th>
                                     <th>Age</th>
                                     <th>Sex</th>
                                     <th>Relation</th>
+                                    <th>Admission Date</th>
+                                    <th>Collection Date</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>
@@ -158,9 +159,7 @@
                     {
                         data: 'name'
                     },
-                    {
-                        data: 'date_of_death'
-                    },
+                   
                     {
                         data: 'age'
                     },
@@ -170,6 +169,12 @@
                     {
                         data: 'relation',
                         orderable: false
+                    },
+                     {
+                        data: 'date_received'
+                    },
+                     {
+                        data: 'date_to'
                     },
                     {
                         data: 'action',

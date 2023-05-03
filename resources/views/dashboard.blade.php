@@ -10,7 +10,7 @@
      
         <div class="row">
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('admit') }}">
+                <a style="color: inherit" href="{{ route('corpses') }}">
                     <div class="info-box">
 
                         <span class="info-box-icon bg-info">
@@ -79,12 +79,12 @@
 
             <!-- /.col -->
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('generate_report') }}">
+                <a style="color: inherit" href="{{ route('corpses') }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-warning"><i class="fas fa-chalkboard-teacher"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">To be Collected</span>
-                            <span class="info-box-number"><sub>60 ({{ date('F Y') }})</sub> </span>
+                            <span class="info-box-number"><sub>{{ $to_be_collected }} ({{ date('F Y') }})</sub> </span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -95,12 +95,12 @@
 
             <!-- /.col -->
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('generate_report') }}">
+                <a style="color: inherit" href="{{ route('corpses') }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-danger"><i class="fas fa-chalkboard-teacher"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Due</span>
-                            <span class="info-box-number"><sub>60</sub> </span>
+                            <span class="info-box-number"><sub>{{ $due?? 0 }}</sub> </span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -111,12 +111,12 @@
 
             <!-- /.col -->
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('generate_report') }}">
+                <a style="color: inherit" href="{{ route('corpses') }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-info"><i class="fas fa-money-check-alt"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Sales</span>
-                            <span class="info-box-number"><sub>N300,000 ({{ date('F Y') }})</sub> </span>
+                            <span class="info-box-number"><sub>N{{ number_format($sales?? 0 , 2)}} ({{ date('F Y') }})</sub> </span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -154,15 +154,15 @@
             <div class="card-body">
                 <div class="d-flex">
                     <p class="d-flex flex-column">
-                        <span class="text-bold text-lg">820</span>
+                        <span class="text-bold text-lg">{{ App\Models\Corpse::count() }}</span>
                         <span>Entries Over Time</span>
                     </p>
-                    <p class="ml-auto d-flex flex-column text-right">
+                    {{-- <p class="ml-auto d-flex flex-column text-right">
                         <span class="text-success">
                             <i class="fas fa-arrow-up"></i> 12.5%
                         </span>
                         <span class="text-muted">Since last week</span>
-                    </p>
+                    </p> --}}
                 </div>
 
                 <div class="position-relative mb-4">

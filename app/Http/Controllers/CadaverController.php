@@ -282,9 +282,10 @@ class CadaverController extends Controller
 
             $id = $record->id;
             $name = $record->name;
-            $added = $record->date_of_death;
             $age = $record->age;
             $sex = $record->sex;
+            $date_received = $record->date_received;
+            $date_to = $record->date_to;
             $relation = $record->family_rep1_name ?? $record->family_rep2_name;
 
             $data_arr[] = array(
@@ -293,7 +294,8 @@ class CadaverController extends Controller
                 "relation" => $relation,
                 "sex" => $sex,
                 "age" => $age,
-                "date_of_death" => $added,
+                "date_received" => $date_received,
+                "date_to" => $date_to,
                 "action" => '<div class="d-flex justify-content-center">
                                             <a class="btn btn-primary m-2" href=' . $view_route . '?id=' . base64_encode($id) . '> <i class="fa fa-eye"></i> View Details</a>
                                             <a class="btn btn-success m-2" href=' . $release_route . '?id=' . base64_encode($id) . '> <i class="fa fa-sign-out-alt"></i> Release</a>
@@ -360,9 +362,9 @@ class CadaverController extends Controller
 
             $days_diff = $date_to->diffInDays(now());
             // dd($days_diff);
-            if($days_diff > 0){
+            if($days_diff > 0 & $date_to < now()){
                 // $due_today = ($daily_fee*$days_diff) + $embalmment_fee;
-                $due_today = ($daily_fee*$days_diff);
+                $due_today = ($daily_fee * $days_diff);
             }
 
             // dd($corpse->date_to, $days_diff, $due_today);
