@@ -73,7 +73,8 @@
 
     $(function() {
         $('.card').find('#overlay-wrapper').css('display', 'none');
-            $("#example1").DataTable({
+
+           var table = $("#example1").DataTable({
                 processing: true,
                 serverSide: true,
                 paging: true,
@@ -131,6 +132,52 @@
                 buttons: [
                 'csv', 'excel', 'pdf', 'print'
                 ],
+
+                  initComplete: function() {
+                // Add date range picker
+                $('<div class="float-right"><input type="text" class="form-control form-control-sm" id="daterange"><button class="btn btn-secondary btn-sm mb-1" ><i class="fas fa-calendar-alt"></i></button></div>')
+                    .appendTo('.dataTables_wrapper .dataTables_filter');
+
+                // Initialize date range picker
+                $('#daterange').daterangepicker({
+                    autoUpdateInput: false,
+                    locale: {
+                        cancelLabel: 'Clear'
+                    },
+                    buttonClasses: 'btn btn-sm btn-outline-secondary',
+                    applyButtonClasses: 'btn-primary text-white',
+                    cancelButtonClasses: 'btn-secondary text-white',
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1,
+                            'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                        'This Month': [moment().startOf('month'), moment().endOf('month')],
+                        'Last Month': [moment().subtract(1, 'month').startOf('month'),
+                            moment().subtract(1, 'month').endOf('month')
+                        ]
+                    },
+                    showCustomRangeLabel: false,
+                    alwaysShowCalendars: true,
+                    opens: 'left'
+                }).on('apply.daterangepicker', function(ev, picker) {
+                    var startDate = picker.startDate.format('YYYY-MM-DD');
+                    var endDate = picker.endDate.format('YYYY-MM-DD');
+                    table.ajax.url("{{ route('get_release_list') }}?start_date=" +
+                        startDate + "&end_date=" + endDate).load();
+                    // set the value of the input field to the selected date range
+                    $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker
+                        .endDate.format('YYYY-MM-DD'));
+
+                }).on('cancel.daterangepicker', function(ev, picker) {
+                    $(this).val('');
+                    $('#daterange').val('');
+                    $('#example1').DataTable().draw();
+                }).attr("placeholder", "Select Date Range").append(
+                    '<i class="fas fa-calendar-alt"></i>');
+
+            }
             });
             
     });

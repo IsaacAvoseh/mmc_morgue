@@ -84,7 +84,7 @@
                         <span class="info-box-icon bg-warning"><i class="fas fa-chalkboard-teacher"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">To be Collected</span>
-                            <span class="info-box-number"><sub>{{ $to_be_collected }} ({{ date('F Y') }})</sub> </span>
+                            <span class="info-box-number"><sub>{{ $to_be_collected?? 0 }} ({{ date('F Y') }})</sub> </span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>

@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/misaslogo.png" type="image/x-icon">
     <title>Log in</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -17,12 +18,13 @@
     <link rel="stylesheet" href="/dist/css/adminlte.min.css">
 </head>
 
-<body class="hold-transition login-page">
+<body class="hold-transition login-page" style="background: url('/login.webp') no-repeat;">
     <div class="login-box">
         <!-- /.login-logo -->
-        <div class="card card-outline card-secondary">
-            <div class="card-header text-center">
-                <a class="h1"><b>MMC</b></a><sub>Morgue</sub>
+        <div class="card card-outline card-success">
+            <div class="card-header text-center jutify-items-center">
+                <img src="/misaslogo.png" style="width:40px" class="mb-2" alt="Misas Logo">
+                <a class="h1"><b>MISAS</b></a><sub>Morgue Management System</sub>
                 @include('flash.flash')
             </div>
             <div class="card-body">
@@ -50,15 +52,15 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
-                                <input type="checkbox" id="remember">
+                                {{-- <input type="checkbox" id="remember">
                                 <label for="remember">
                                     Remember Me
-                                </label>
+                                </label> --}}
                             </div>
                         </div>
                         <!-- /.col -->
                         <div class="col-4">
-                            <button type="submit" class="btn btn-secondary btn-block">Sign In</button>
+                            <button type="submit" class="btn btn-success btn-block">Sign In</button>
                         </div>
                         <!-- /.col -->
                     </div>

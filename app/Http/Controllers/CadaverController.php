@@ -448,27 +448,63 @@ class CadaverController extends Controller
         $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
-        // Total records
-        $totalRecords = Release::with('corpse')
+        // Check if start and end date are present in the request
+        if (isset($request->start_date) && isset($request->end_date)) {
+            $startDate = Carbon::createFromFormat('Y-m-d', request()->input('start_date'))->startOfDay();
+            $endDate = Carbon::createFromFormat('Y-m-d', request()->input('end_date'))->endOfDay();
+
+            // Total records between selected date range
+            $totalRecords = Release::with('corpse')
             ->whereHas('corpse', function ($query) use ($searchValue) {
                 $query->where('name', 'like', '%' . $searchValue . '%');
             })
-            ->count();
-        $totalRecordswithFilter = Release::with('corpse')
-            ->whereHas('corpse', function ($query) use ($searchValue) {
-                $query->where('name', 'like', '%' . $searchValue . '%');
-            })
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
 
-        // Fetch records
-        $records = Release::with('corpse')
+            $totalRecordswithFilter = Release::with('corpse')
             ->whereHas('corpse', function ($query) use ($searchValue) {
                 $query->where('name', 'like', '%' . $searchValue . '%');
             })
-            ->orderByDesc('created_at')
-            ->skip($start)
-            ->take($rowperpage)
-            ->get();
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+
+            // Fetch records between selected date range
+            $records = Release::with('corpse')
+                ->whereHas('corpse', function ($query) use ($searchValue) {
+                    $query->where('name', 'like', '%' . $searchValue . '%');
+                })
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->orderByDesc('created_at')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        } else {
+            // Total records for today
+            $totalRecords = Release::with('corpse')
+            ->whereHas('corpse', function ($query) use ($searchValue) {
+                $query->where('name', 'like', '%' . $searchValue . '%');
+            })
+            ->whereDate('created_at', Carbon::today())
+            ->count();
+
+            $totalRecordswithFilter = Release::with('corpse')
+            ->whereHas('corpse', function ($query) use ($searchValue) {
+                $query->where('name', 'like', '%' . $searchValue . '%');
+            })
+            ->whereDate('created_at', Carbon::today())
+            ->count();
+
+            // Fetch records for today
+            $records = Release::with('corpse')
+                ->whereHas('corpse', function ($query) use ($searchValue) {
+                    $query->where('name', 'like', '%' . $searchValue . '%');
+                })
+                ->whereDate('created_at', Carbon::today())
+                ->orderByDesc('created_at')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        }
 
         $data_arr = array();
         $view_route = route('get_corpse');

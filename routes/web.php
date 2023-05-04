@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CadaverController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\PaymentHistoryController;
 use App\Http\Controllers\RackController;
 use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Auth;
@@ -77,28 +78,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::match(['GET', 'POST'],'/update_payment', [CadaverController::class, 'update_payment'])->name('update_payment');
 
 
+    // payment_history
+    Route::get('payment_history', [PaymentHistoryController::class, 'index'])->name('payment_history');
+    Route::get('get_payment_history', [PaymentHistoryController::class, 'get_payment_history'])->name('get_payment_history');
     
-    Route::post('/billing_import', [BillingImportController::class, 'import'])->name('billing_import');
-    Route::post('/payment_import', [PaymentImportController::class, 'import'])->name('payment_import');
-    Route::match(['GET', 'POST'], 'payments', [AdminController::class, 'payments'])->name('payments');
-    Route::get('get_billings', [AdminController::class, 'get_billings'])->name('get_billings');
-    Route::get('get_payments', [AdminController::class, 'get_payments'])->name('get_payments');
-    Route::delete('delete_billing', [AdminController::class, 'delete_billing'])->name('delete_billing');
-    Route::delete('delete_payment', [AdminController::class, 'delete_payment'])->name('delete_payment');
-    Route::match(['GET', "POST"], 'generate_report', [AdminController::class, 'generate_report'])->name('generate_report');
-    Route::match(['GET', "POST"], 'generate_report_usd', [AdminController::class, 'generate_report_usd'])->name('generate_report_usd');
-    Route::match(['GET', "POST"], 'get_summary', [AdminController::class, 'get_summary'])->name('get_summary');
-    Route::match(['GET', "POST"], 'get_summary_usd', [AdminController::class, 'get_summary_usd'])->name('get_summary_usd');
-    Route::match(['GET', "POST"], 'create_session', [AuditPeriodController::class, 'create_session'])->name('create_session');
-    Route::get('/change_session', [AuditPeriodController::class, 'change_session'])->name('change_session');
-    Route::get('/periods', [AuditPeriodController::class, 'periods'])->name('periods');
-    Route::delete('/delete_session', [AuditPeriodController::class, 'delete_session'])->name('delete_session');
-    Route::get('/view_period', [AuditPeriodController::class, 'view_period'])->name('view_period');
-    Route::match(['GET', 'POST'], '/airlines', [AirlineController::class, 'airlines'])->name('airlines');
-    Route::post('/airline_import', [AirlineController::class, 'airline_import'])->name('airline_import');
-    Route::get('/get_airline', [AirlineController::class, 'get_airline'])->name('get_airline');
-
-    
+    // users
     Route::match(['GET', 'POST'], 'users', [AuthController::class, 'users'])->name('users');
     Route::delete('delete_user', [AuthController::class, 'delete_user'])->name('delete_user');
     Route::get('get_user', [AuthController::class, 'get_user'])->name('get_user');
