@@ -74,6 +74,7 @@ class PaymentHistoryController extends Controller
         $transfer = Payment::where('mode', 'tranfer')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum(DB::raw('price * qty'));
         $pos = Payment::where('mode', 'pos')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum(DB::raw('price * qty'));
         $others = Payment::where('mode', 'others')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum(DB::raw('price * qty'));
+        $total = $cash + $transfer + $pos + $others;
 
         foreach ($records as $key => $record) {
             $id = $record->id;
@@ -104,6 +105,7 @@ class PaymentHistoryController extends Controller
             'transfer' => number_format($transfer,2),
             'pos' => number_format($pos,2),
             'others' => number_format($others,2),
+            'total' => number_format($total,2),
         );
 
         echo json_encode($response);

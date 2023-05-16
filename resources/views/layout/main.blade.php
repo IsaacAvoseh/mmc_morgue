@@ -8,21 +8,19 @@
     <link rel="shortcut icon" href="/misaslogo.png" type="image/x-icon">
 
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    {{-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"> --}}
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <!-- IonIcons -->
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    {{-- <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> --}}
     <!-- Theme style -->
     <link rel="stylesheet" href="/dist/css/adminlte.min.css">
     <!-- DataTables -->
     <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-    {{-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.12.1/datatables.min.css" /> --}}
 
     <!-- daterange picker -->
     <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
@@ -52,7 +50,7 @@
                 <li class="nav-item d-none d-sm-inline-block">
                     <a href="#" class="nav-link">{{ Auth::user()->name ?? 'Admin' }}</a>
                 </li>
-            
+
             </ul>
 
             <!-- Right navbar links -->
@@ -71,9 +69,10 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="{{ route('dashboard') }}" class="brand-link">
-                <img src="/misaslogo.png" alt="Misas Logo " class="brand-image img-circle elevation-3" style="opacity: .8">
+                <img src="/misaslogo.png" alt="Misas Logo " class="brand-image img-circle elevation-3"
+                    style="opacity: .8">
                 {{-- <img src="/misaslogo.png" style="width:40px" class="mb-2" alt="Misas Logo"> --}}
-                <span class="brand-text font-weight-light">MISAS <sub>Morgue System</sub></span>
+                <span class="brand-text font-weight-light text-white">MISAS <sub>Morgue System</sub></span>
             </a>
 
             <!-- Sidebar -->
@@ -86,7 +85,7 @@
                         data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                 with font-awesome or any other icon font library -->
-                        <li class="nav-item menu-open">
+                        <li class="nav-item">
                             <a href="{{ route('dashboard') }}"
                                 class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/dashboard'? 'active': '' }}">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -97,8 +96,8 @@
                             </a>
 
                         </li>
-                       
-                         <li class="nav-item">
+
+                        <li class="nav-item">
                             <a href="{{ route('corpses') }}"
                                 class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/corpses'? 'active': '' }}">
                                 <i class="nav-icon fas fa-bed"></i>
@@ -111,21 +110,32 @@
                         <li class="nav-item">
                             <a href="{{ route('admit') }}"
                                 class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/corpses/admit'? 'active': '' }}">
-                               
+
                                 <i class="nav-icon fas fa-file-invoice"></i>
                                 <p>
                                     Admit
                                 </p>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{ route('release_list') }}"
                                 class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/release_list'? 'active': '' }}">
-        
+
                                 <i class="nav-icon  fas fa-sign-out-alt"></i>
-                            
+
                                 <p>
                                     Released
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('reports') }}"
+                                class="nav-link {{ request()->route() && request()->route()->uri() == 'admin/reports'? 'active': '' }}">
+                                <i class="nav-icon  fas fa-folder-open"></i>
+                                <p>
+                                    Reports
                                 </p>
                             </a>
                         </li>
@@ -140,6 +150,7 @@
                             </a>
                         </li>
 
+                        @if (Auth::user() && Auth::user()->type == 'admin')
                         <li class="nav-item">
                             <a href="{{ route('services') }}"
                                 class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/services'? 'active': '' }}">
@@ -159,6 +170,7 @@
                                 </p>
                             </a>
                         </li>
+                        @endif
 
                         <li class="nav-item">
                             <a href="{{ route('payment_history') }}"
@@ -169,8 +181,82 @@
                                 </p>
                             </a>
                         </li>
-                
 
+                        <li class="nav-item {{ request()->route() && (request()->route()->uri() == 'admin/inventory' || request()->route()->uri() == 'admin/item_request' || request()->route()->uri() == 'admin/request_list' || request()->route()->uri() == 'admin/inventory/history' || request()->route()->uri() == 'admin/inventory/expenses') ? 'menu-open' : '' ||  request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'? 'menu-open': '' }}" id="inventory">
+                                <a href="#" class="nav-link {{ request()->route() && (request()->route()->uri() == 'admin/inventory' || request()->route()->uri() == 'admin/item_request' || request()->route()->uri() == 'admin/request_list' || request()->route()->uri() == 'admin/inventory/history' || request()->route()->uri() == 'admin/inventory/expenses') ? 'active' : '' ||  request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'? 'active': '' }}">
+                                <i class="nav-icon fas fa-warehouse"></i>
+                                <p>
+                                    Inventory
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('inventory') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory'? 'active': '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>
+                                            Inventory
+                                        </p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('item_request') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/item_request'? 'active': '' }}">
+                                        <i class="far fa-circle nav-icon text-primary"></i>
+                                        <p>
+                                            Requisition
+                                        </p>
+                                    </a>
+                                </li>
+
+                                @if (Auth::user() && Auth::user()->type == 'admin')
+                                <li class="nav-item">
+                                    <a href="{{ route('request_list') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/request_list'? 'active': '' }}">
+                                        <i class="far fa-circle nav-icon text-warning"></i>
+                                        <p>
+                                            Requests
+                                        </p>
+                                    </a>
+                                </li>
+                                @endif
+
+                                <li class="nav-item">
+                                    <a href="{{ route('history') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/history'? 'active': '' }}">
+                                        <i class="far fa-circle nav-icon text-success"></i>
+                                        <p>
+                                            History
+                                        </p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('expenses') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/expenses'? 'active': '' }}">
+                                        <i class="far fa-circle nav-icon text-danger"></i>
+                                        <p>
+                                            Expense Journal
+                                        </p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('expense_category') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'? 'active': '' }}">
+                                        <i class="far fa-circle nav-icon text-secondary"></i>
+                                        <p>
+                                            Expense Category
+                                        </p>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+
+                      @if (Auth::user() && Auth::user()->type == 'admin')
                         <li class="nav-item">
                             <a href="{{ route('users') }}"
                                 class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/users'? 'active': '' }}">
@@ -180,6 +266,7 @@
                                 </p>
                             </a>
                         </li>
+                        @endif
                         {{-- Log out --}}
                         <li class="nav-item">
                             <a href="/logout" class="nav-link">
@@ -240,17 +327,18 @@
 
     </div>
     <!-- ./wrapper -->
-   
-    
+
+
     <!-- REQUIRED SCRIPTS -->
 
     <!-- jQuery -->
     <script src="/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap -->
     <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE -->
+    <script src="/dist/js/adminlte.js"></script>
     <!-- Toastr -->
     <script src="/plugins/toastr/toastr.min.js"></script>
-    <!-- jQuery -->
     <!-- SweetAlert2 -->
     <script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- DataTables  & Plugins -->
@@ -268,10 +356,9 @@
     <script src="/plugins/jszip/jszip.min.js"></script>
     <script src="/plugins/pdfmake/pdfmake.min.js"></script>
     <script src="/plugins/pdfmake/vfs_fonts.js"></script>
-      <script src="/plugins/chart.js/Chart.min.js"></script>
-    <script src="/dist/js/pages/dashboard3.js"></script>
-    <!-- AdminLTE -->
-    <script src="/dist/js/adminlte.js"></script>
+
+     @yield('scripts')
+  
 
 </body>
 

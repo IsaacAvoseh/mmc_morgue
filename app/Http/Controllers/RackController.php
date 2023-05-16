@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Rack;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 // use App\Traits\CrudTrait;
 
 class RackController extends Controller
@@ -77,19 +79,20 @@ class RackController extends Controller
             $id = $record->id;
             $name = $record->name;
             $status = $record->status;
-            $added = $record->created_at->diffForHumans();
-            // $added = $record->created_at->format('Y-m-d');
+            $corpse = DB::table('corpses')->where('rack_id', $id)->where('status', 'admitted')->get()->last();
+            // $corpse = $record->created_at->format('Y-m-d');
 
             $data_arr[] = array(
-                "id" => $key + 1,
+                "id" => ($start / $rowperpage) * $rowperpage + $key + 1,
                 "name" => $name,
                 "status" => $status,
-                "added" => $added,
+                "corpse" => isset($corpse) ? '<a href="' . route('get_corpse', ['id' => base64_encode($corpse->id?? '')]) . '">' . ($corpse->name ?? 'None') . '</a>' : 'None',
                 "action" => '  <div class="d-flex">
-                                            <a class="btn btn-primary m-2" onclick="get_rack(' . $id . ')"> <i class="fa fa-edit"></i> </a>
-                                            <a class="btn btn-danger m-2" onclick="deleteConfirm(' . $id . ',' . "'$name'" .  ')"> <i class="fa fa-trash"></i> </a>
-                                 </div>',
+                            <a class="btn btn-primary m-2" onclick="get_rack(' . $id . ')"> <i class="fa fa-edit"></i> </a>
+                            <a class="btn btn-danger m-2" onclick="deleteConfirm(' . $id . ',' . "'$name'" .  ')"> <i class="fa fa-trash"></i> </a>
+                 </div>',
             );
+
         }
 
         $response = array(

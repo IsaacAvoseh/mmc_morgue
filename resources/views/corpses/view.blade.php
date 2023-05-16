@@ -15,8 +15,10 @@
                 <!-- /.modal-dialog -->
                 <div class="card">
                     <div class="card-header">
-                        <div class="row justify-content-center">
-                            <p class="h5">{{ $data->name?? 'Corpse' }}</p>
+                        <a class="align-self-start btn btn-default" href="{{ url()->previous() }}"> <i
+                                class="fa fa-arrow-left"> </i> Back</a>
+                        <div class="row d-flex justify-content-center">
+                            <p class="h5">{{ $data->name ?? 'Corpse' }}</p>
                         </div>
                         {{-- lodaing spinner --}}
                         <div class="overlay-wrapper hidden" id="overlay-wrapper">
@@ -29,34 +31,86 @@
                     <!-- /.card-header -->
                     <div class="card-body">
 
-                        <div class="modal-body" id="admission_form">
-
-                           
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Details:</h6>
+                                <p><strong>Place of Death:</strong> {{ $data->place_of_death?? '-' }}</p>
+                                <p><strong>Sex:</strong> {{ $data->sex?? '-' }}</p>
+                                <p><strong>Age:</strong> {{ $data->age?? '-' }}</p>
+                                <p><strong>Address:</strong> {{ $data->address?? '-' }}</p>
+                                <p><strong>Date of Death:</strong> {{ $data->date_of_death?? '-' }}</p>
+                                <p><strong>Time of Death:</strong> {{ $data->time_of_death?? '-' }}</p>
+                                <p><strong>Date Received:</strong> {{ $data->date_received?? '-' }}</p>
+                                <p><strong>Time Received:</strong> {{ $data->time_received?? '-' }}</p>
+                                <p><strong>No. of Days:</strong> {{ $data->no_of_days?? '-' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Family Representatives:</h6>
+                                <p><strong>Name:</strong> {{ $data->family_rep1_name?? '-' }}</p>
+                                <p><strong>Address:</strong> {{ $data->family_rep1_address?? '-' }}</p>
+                                <p><strong>Phone:</strong> {{ $data->family_rep1_phone?? '-' }}</p>
+                                <p><strong>Relationship:</strong> {{ $data->family_rep1_rel?? '-' }}</p>
+                                <hr>
+                                <p><strong>Name:</strong> {{ $data->family_rep2_name?? '-' }}</p>
+                                <p><strong>Address:</strong> {{ $data->family_rep2_address?? '-' }}</p>
+                                <p><strong>Phone:</strong> {{ $data->family_rep2_phone?? '-' }}</p>
+                                <p><strong>Relationship:</strong> {{ $data->family_rep2_rel?? '-' }}</p>
+                            </div>
                         </div>
-
-                       
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                        <h6>Other Details:</h6>
+                        <p><strong>Items Collected By:</strong> {{ $data->items_collected_by?? '-' }}</p>
+                        <p><strong>Items Collected Phone:</strong> {{ $data->items_collected_phone?? '-' }}</p>
+                        <p><strong>Status:</strong> {{ $data->status?? '-' }}</p>
+                        <p><strong>Rack ID:</strong> {{ \App\Models\Rack::find($data->rack_id)->name ?? '-' }}</p>
+                        <p><strong>Paid:</strong> {{ $data->paid?? '-' }}</p>
+                        <p><strong>Amount:</strong> N{{ number_format($data->amount, 2)?? '0' }}</p>
+                        <p><strong>Date From:</strong> {{ $data->date_from }}</p>
+                        <p><strong>Date To:</strong> {{ $data->date_to?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <p><strong>Uploaded Files</strong></p>
+                                @forelse ($files as $file)
+                                <div class="row w-100">
+                                    <p> <b>{{ $file->document->name?? '-' }}</b> <a href="{{  asset('storage/app/'.$file->path) }}" download="{{ $file->document->name}}" >Download</a> </p>
+                                @empty
+                                    <p><b>No file uploaded</b></p>
+                                </div>
+                                @endforelse
+                            </div>
+                            <a class="btn btn-success m-2" href="{{ route('release', ['id' => base64_encode($data->id)]) }}"> <i class="fa fa-sign-out-alt"></i> Release</a>
+                             {{-- <a class="btn btn-default" href="{{route('update_payment', ['id' => base64_encode($data->id)]) }}">Click here to pay</a> --}}
+                        </div>
+                        </div>
                     </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
             </div>
-            <!-- /.col -->
         </div>
     </div>
-    <!-- /.row -->
+</div>
+</div>
+<!-- /.card-body -->
+</div>
+<!-- /.card -->
+</div>
+<!-- /.col -->
+</div>
+</div>
+<!-- /.row -->
 </div>
 <!-- /.container-fluid -->
 <!-- /.content -->
 
-<!-- jQuery -->
-<script src="/plugins/jquery/jquery.min.js"></script>
-<!-- SweetAlert2 -->
-<script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
-
+@section('scripts')
+    @parent
 <script>
-    document.addEventListener("DOMContentLoaded", function(event) { 
-  document.getElementById('date_from').valueAsDate = new Date();
-});
+    document.addEventListener("DOMContentLoaded", function(event) {
+        document.getElementById('date_from').valueAsDate = new Date();
+    });
+
     function loading() {
         $('.card').find('#overlay-wrapper').css('display', 'block');
     }
@@ -131,13 +185,12 @@
     }
 
     $(function() {
-        $(function() {
             $('.card').find('#overlay-wrapper').css('display', 'none');
             $('.card').find('#overlay-wrapper1').css('display', 'none');
             $('#admission_form').attr('hidden', false);
             // $('#admission_form2').attr('hidden', false);
 
-        });
     });
 </script>
+@endsection
 @endsection

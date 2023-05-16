@@ -162,10 +162,8 @@
 <!-- /.container-fluid -->
 <!-- /.content -->
 
-<!-- jQuery -->
-<script src="/plugins/jquery/jquery.min.js"></script>
-<!-- SweetAlert2 -->
-<script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
+@section('scripts')
+    @parent
 <script>
     function loading() {
         $('.card').find('#overlay-wrapper').css('display', 'block');
@@ -352,4 +350,5 @@
         }
     }
 </script>
+@endsection
 @endsection

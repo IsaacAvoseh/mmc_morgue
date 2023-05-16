@@ -274,11 +274,8 @@
 <!-- /.container-fluid -->
 <!-- /.content -->
 
-<!-- jQuery -->
-<script src="/plugins/jquery/jquery.min.js"></script>
-<!-- SweetAlert2 -->
-<script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
-
+@section('scripts')
+    @parent
 <script>
     document.addEventListener("DOMContentLoaded", function(event) {
         document.getElementById('date_from').valueAsDate = new Date();
@@ -372,4 +369,5 @@
         });
     });
 </script>
+@endsection
 @endsection

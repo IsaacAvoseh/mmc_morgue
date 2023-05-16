@@ -2,7 +2,7 @@
 
 
 @section('content')
-@section('title', 'Payment History')
+@section('title', 'Reports')
 <!-- Main content -->
 <div class="content">
     <div class="container-fluid">
@@ -11,73 +11,45 @@
         </p>
         <div class="row">
             <div class="col-12">
-                <div class="row">
+  <div class="row">
                     <div class="col-md-3 col-sm-6 col-12">
                         <div class="info-box">
                             <span class="info-box-icon bg-info">
-                                <i class="fas fa-file-invoice"></i>
+                                <i class="fas fa-border-all"></i>
                             </span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Cash</span>
-                                <span class="info-box-number" id="cash"></span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-success">
-                                <i class="fas fa-money-check"></i>
-                            </span>
-
-                            <div class="info-box-content">
-                                <span class="info-box-text">Transfer</span>
-                                <span class="info-box-number" id="transfer"></span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-
-                    <!-- /.col -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-primary"><i class="fas fa-money-check-alt"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">POS</span>
-                                <span class="info-box-number" id="pos"> </span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-
-                    <!-- /.col -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-secondary"><i class="fas fa-money-check-alt"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Others</span>
-                                <span class="info-box-number" id="others"></span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-
-                    <!-- /.col -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-warning"><i class="fas fa-money-check-alt"></i></span>
                             <div class="info-box-content">
                                 <span class="info-box-text">Total</span>
                                 <span class="info-box-number" id="total"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-primary">
+                                <i class="fas fa-file-invoice"></i>
+                            </span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Admitted</span>
+                                <span class="info-box-number" id="admitted"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success"><i class="fas fa-sign-out-alt"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Released</span>
+                                <span class="info-box-number" id="released"> </span>
                             </div>
                             <!-- /.info-box-content -->
                         </div>
@@ -88,9 +60,14 @@
                 </div>
                 <div class="card">
                     <div class="card-header">
-
+                        {{-- <div class="row justify-content-between">
+                            <a href="{{ route('admit') }}" type="button" class="btn btn-primary btn-sm rounded">
+                                <i class="fa fa-plus"></i>
+                                Admit
+                            </a>
+                        </div> --}}
                         {{-- lodaing spinner --}}
-                        <div class="overlay-wrapper" id="overlay-wrapper">
+                        <div class="overlay-wrapper hidden" id="overlay-wrapper">
                             <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
                             </div>
                         </div>
@@ -103,12 +80,14 @@
                             <thead>
                                 <tr>
                                     <th>S/N</th>
-                                    <th>Date</th>
-                                    <th>Corpse</th>
-                                    <th>Amount</th>
-                                    <th>Payment</th>
-                                    <th>Payment Method</th>
-                                    <th>User</th>
+                                    <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Sex</th>
+                                    <th>Relation</th>
+                                    <th>Admission Date</th>
+                                    <th>Collection Date</th>
+                                    <th>Rack</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -126,6 +105,7 @@
 <!-- /.container-fluid -->
 <!-- /.content -->
 
+
 @section('scripts')
     @parent
 <script>
@@ -135,52 +115,58 @@
 
     $(function() {
         $('.card').find('#overlay-wrapper').css('display', 'none');
-
-        var table = $("#example1").DataTable({
+      
+          var table = $("#example1").DataTable({
             processing: true,
             serverSide: true,
             paging: true,
-            ordering: false,
+            ordering: true,
             pageLength: 50,
             responsive: true,
             info: true,
             ajax: {
                 type: "GET",
-                url: "{{ route('get_payment_history') }}",
+                url: "{{ route('get_reports') }}",
                 dataSrc: function(data) {
                     console.log('data', data)
-                    $('#cash').text(data.cash)
-                    $('#transfer').text(data.transfer)
-                    $('#pos').text(data.pos)
-                    $('#others').text(data.others)
                     $('#total').text(data.total)
+                    $('#admitted').text(data.admitted)
+                    $('#released').text(data.released)
+            
                     return data.aaData
                 }
             },
-            columns: [{
+             columns: [{
                     data: 'id',
+                    orderable: false
 
                 },
                 {
-                    data: 'date'
-                },
-                {
-                    data: 'corpse_name'
-                },
-                {
-                    data: 'amount'
-                },
-                {
-                    data: 'service'
-                },
-                {
-                    data: 'payment_method'
+                    data: 'name'
                 },
 
                 {
-                    data: 'user_name'
+                    data: 'age'
                 },
-
+                {
+                    data: 'sex'
+                },
+                {
+                    data: 'relation',
+                    orderable: false
+                },
+                {
+                    data: 'date_received'
+                },
+                {
+                    data: 'date_to'
+                },
+                {
+                    data: 'rack',
+                },
+                {
+                    data: 'status',
+                },
 
             ],
             dom: '<"top"lBf>rt<"bottom"ip>',
@@ -219,7 +205,7 @@
                 }).on('apply.daterangepicker', function(ev, picker) {
                     var startDate = picker.startDate.format('YYYY-MM-DD');
                     var endDate = picker.endDate.format('YYYY-MM-DD');
-                    table.ajax.url("{{ route('get_payment_history') }}?start_date=" +
+                    table.ajax.url("{{ route('get_reports') }}?start_date=" +
                         startDate + "&end_date=" + endDate).load();
                     // set the value of the input field to the selected date range
                     $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker
@@ -235,10 +221,18 @@
             }
         });
 
-
-
-
     });
+
+
+
+
+    function showUpload() {
+        if ($('#show_upload').attr('hidden')) {
+            $('#show_upload').attr('hidden', false);
+        } else {
+            $('#show_upload').attr('hidden', true);
+        }
+    }
 </script>
 @endsection
 @endsection

@@ -12,71 +12,6 @@
         <div class="row">
             <div class="col-12">
 
-
-                {{-- add new modal --}}
-
-                {{-- Update modal --}}
-                <div class="modal fade" id="update_modal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title">Update Airline</h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="overlay-wrapper hidden" id="overlay-wrapper">
-                                    <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
-                                    </div>
-                                </div>
-                                {{-- end loading spinner --}}
-                                <p class="text-danger text-bold"> Please type airline correctly or copy and pase from
-                                    payment or billing excel sheet</p>
-                                <form action="{{ route('corpses') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="id" id="id">
-                                    <div class="form-group">
-                                        <label>Name</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="text" name="name" id="name"
-                                                value="{{ old('name') }}" class="form-control datetimepicker-input"
-                                                placeholder="Africa World Corpses Limited" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Naira Opening Balance:</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="number" name="naira_opening" min="0" id="naira_opening"
-                                                placeholder="18278666.12" value="{{ old('naira_opening') }}"
-                                                class="form-control datetimepicker-input"
-                                                data-target="#reservationdate">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>USD Opening Balance:</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="number" name="usd_opening" min="0" id="usd_opening"
-                                                placeholder="18278666.12" class="form-control datetimepicker-input"
-                                                value="{{ old('usd_opening') }}" data-target="#reservationdate">
-                                        </div>
-                                    </div>
-
-                                    <div class="modal-footer justify-content-between">
-                                        <button type="button" class="btn btn-default"
-                                            data-dismiss="modal">Close</button>
-                                        <button type="button" onclick="airline_edit()"
-                                            class="btn btn-primary">Submit</button>
-                                    </div>
-                                </form>
-                            </div>
-
-                        </div>
-                        <!-- /.modal-content -->
-                    </div>
-                    <!-- /.modal-dialog -->
-                </div>
-
                 <div class="card">
                     <div class="card-header">
                         <div class="row justify-content-between">
@@ -146,7 +81,7 @@
             info: true,
             ajax: {
                 type: "GET",
-                url: "{{ route('get_corpses') }}",
+                url: "{{ route('get_view_by_due_and_to_be_collected_this_month', ['stats' => request()->query('stats')]) }}",
                 dataSrc: function(data) {
                     return data.aaData
                 }

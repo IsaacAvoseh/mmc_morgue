@@ -524,11 +524,8 @@
 <!-- /.container-fluid -->
 <!-- /.content -->
 
-<!-- jQuery -->
-<script src="/plugins/jquery/jquery.min.js"></script>
-<!-- SweetAlert2 -->
-<script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
-
+@section('scripts')
+    @parent
 <script>
      var Toast = Swal.mixin({
       toast: true,
@@ -822,7 +819,6 @@
     }
 
     $(function() {
-        $(function() {
             $('.card').find('#overlay-wrapper').css('display', 'none');
             $('.card').find('#overlay-wrapper1').css('display', 'none');
             $('.card').find('#overlay-wrapper2').css('display', 'none');
@@ -1010,8 +1006,6 @@
         });
 
 
-    });
-
     function resetForm() {
         // Reset all unit fees to 0
         $('.unit-fee').val(0);
@@ -1040,12 +1034,25 @@
         const timestamp = Date.now();
         // Combine the random number and timestamp to create the receipt number
         const receiptNumber = `#REC-${randomNumber}-${timestamp}`;
+        const today = new Date();
+const day = today.getDate();
+const month = today.getMonth() + 1; // Months are zero-indexed, so January is 0
+const year = today.getFullYear();
+const hours = today.getHours();
+const minutes = today.getMinutes();
+const seconds = today.getSeconds();
 
+const formattedDate = `${day}/${month}/${year}`;
+const formattedTime = `${hours}:${minutes}:${seconds}`;
         // Create a table to display the receipt
         var table = '<table>' +
             '<thead>' +
-            `<tr> ${receiptNumber} </tr>` +
+            `<tr> MMC MORTUARY AND FUNERAL HOME </tr> <br>` +
+            `<tr><small>30/32 ADENLE STREET, OFF ALFA NLA ROAD, OKE-KOTO, AGEGE, LAGOS</small>  </tr><br>` +
+            `<tr> ${`${formattedDate}, ${formattedTime}`} </tr> <br>` +
+            `<tr> ${receiptNumber} </tr> <br>` +
             '<tr>' +
+            '<hr>' +
             '<th>Fee</th>' +
             '<th>Amount</th>' +
             '<th>Units</th>' +
@@ -1100,71 +1107,6 @@
         printWindow.print();
     }
 
-    function printReceipt() {
-        // Get the receipt HTML element
-        const receipt = document.getElementById('rcp');
-        // Clone the receipt node so we can modify it without changing the original
-        const clonedReceipt = receipt.cloneNode(true);
-        // Remove the print button from the cloned receipt
-        const printButton = clonedReceipt.querySelector('#print-btn');
-        printButton.parentNode.removeChild(printButton);
-        // Open a new window with the cloned receipt
-        const printWindow = window.open('', 'Print Receipt');
-        printWindow.document.write(clonedReceipt.innerHTML);
-        //   printWindow.document.close();
-        // Print the receipt
-        printWindow.print();
-    }
-
-    function generateReceipt4() {
-        // Get the selected fees
-        const selectedFees = document.querySelectorAll('input[type="checkbox"]:checked');
-        console.log(typeof(selectedFees))
-        // Calculate the total amount
-        let totalAmount = 0;
-        selectedFees.forEach((fee) => {
-            totalAmount += parseFloat(fee.dataset.amount) * parseInt(fee.closest('tr').querySelector(
-                '.unit-fee').value);
-        });
-
-        // Create the receipt HTML
-            const receiptHTML = `
-        <h1>Receipt</h1>
-        <table>
-        <thead>
-            <tr>
-            <th>Fee</th>
-            <th>Amount</th>
-            <th>Unit</th>
-            <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${selectedFees.map((fee) => `
-            <tr>
-                <td>${fee.closest('td').previousElementSibling.textContent}</td>
-                <td>${fee.dataset.amount}</td>
-                <td>${fee.closest('tr').querySelector('.unit-fee').value}</td>
-                <td>${(parseFloat(fee.dataset.amount) * parseInt(fee.closest('tr').querySelector('.unit-fee').value)).toFixed(2)}</td>
-            </tr>
-            `).join('')}
-            <tr>
-            <td colspan="3"><strong>Total:</strong></td>
-            <td><strong>${totalAmount.toFixed(2)}</strong></td>
-            </tr>
-        </tbody>
-        </table>
-          `;
-
-            // Create a new window with the receipt HTML
-            const receiptWindow = window.open('', 'PRINT', 'height=600,width=800');
-            receiptWindow.document.write(`<html><head><title>Receipt</title></head><body>${receiptHTML}</body></html>`);
-
-            // Prompt the user to print the receipt
-            receiptWindow.document.close();
-            receiptWindow.focus();
-            receiptWindow.print();
-            receiptWindow.close();
-    }
 </script>
+@endsection
 @endsection

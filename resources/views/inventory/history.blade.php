@@ -2,7 +2,7 @@
 
 
 @section('content')
-@section('title', 'Payment History')
+@section('title', 'Inventory History')
 <!-- Main content -->
 <div class="content">
     <div class="container-fluid">
@@ -11,81 +11,7 @@
         </p>
         <div class="row">
             <div class="col-12">
-                <div class="row">
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-info">
-                                <i class="fas fa-file-invoice"></i>
-                            </span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Cash</span>
-                                <span class="info-box-number" id="cash"></span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-success">
-                                <i class="fas fa-money-check"></i>
-                            </span>
-
-                            <div class="info-box-content">
-                                <span class="info-box-text">Transfer</span>
-                                <span class="info-box-number" id="transfer"></span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-
-                    <!-- /.col -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-primary"><i class="fas fa-money-check-alt"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">POS</span>
-                                <span class="info-box-number" id="pos"> </span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-
-                    <!-- /.col -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-secondary"><i class="fas fa-money-check-alt"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Others</span>
-                                <span class="info-box-number" id="others"></span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-
-                    <!-- /.col -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-warning"><i class="fas fa-money-check-alt"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Total</span>
-                                <span class="info-box-number" id="total"></span>
-                            </div>
-                            <!-- /.info-box-content -->
-                        </div>
-                        <!-- /.info-box -->
-                    </div>
-                    <!-- /.col -->
-
-                </div>
+            
                 <div class="card">
                     <div class="card-header">
 
@@ -104,10 +30,11 @@
                                 <tr>
                                     <th>S/N</th>
                                     <th>Date</th>
-                                    <th>Corpse</th>
-                                    <th>Amount</th>
-                                    <th>Payment</th>
-                                    <th>Payment Method</th>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Unit of Measure</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
                                     <th>User</th>
                                 </tr>
                             </thead>
@@ -146,14 +73,13 @@
             info: true,
             ajax: {
                 type: "GET",
-                url: "{{ route('get_payment_history') }}",
+                url: "{{ route('get_inventory_history') }}",
                 dataSrc: function(data) {
                     console.log('data', data)
                     $('#cash').text(data.cash)
                     $('#transfer').text(data.transfer)
                     $('#pos').text(data.pos)
                     $('#others').text(data.others)
-                    $('#total').text(data.total)
                     return data.aaData
                 }
             },
@@ -165,22 +91,23 @@
                     data: 'date'
                 },
                 {
-                    data: 'corpse_name'
+                    data: 'name'
                 },
                 {
-                    data: 'amount'
+                    data: 'qty'
                 },
                 {
-                    data: 'service'
+                    data: 'unit_of_measure'
                 },
                 {
-                    data: 'payment_method'
+                    data:'type'
                 },
-
                 {
-                    data: 'user_name'
+                    data: 'status'
                 },
-
+                {
+                    data: 'user'
+                },
 
             ],
             dom: '<"top"lBf>rt<"bottom"ip>',
@@ -219,7 +146,7 @@
                 }).on('apply.daterangepicker', function(ev, picker) {
                     var startDate = picker.startDate.format('YYYY-MM-DD');
                     var endDate = picker.endDate.format('YYYY-MM-DD');
-                    table.ajax.url("{{ route('get_payment_history') }}?start_date=" +
+                    table.ajax.url("{{ route('get_inventory_history') }}?start_date=" +
                         startDate + "&end_date=" + endDate).load();
                     // set the value of the input field to the selected date range
                     $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker

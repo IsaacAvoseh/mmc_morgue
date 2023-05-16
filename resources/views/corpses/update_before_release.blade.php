@@ -55,7 +55,7 @@
                                         @forelse ($files as $key => $file)
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>{{ $file->name ?? 'File' }}:</label>
+                                                    <label>{{ $file->name ?? 'File' }} <span class="text-danger" >{{ $file->required == 'yes' ? '***' : '' }}</span></label>
                                                     <div class="input-group date" id="reservationdate"
                                                         data-target-input="nearest">
                                                         <input type="file" name="document_{{ $key + 1 }}"
@@ -266,11 +266,8 @@
 <!-- /.container-fluid -->
 <!-- /.content -->
 
-<!-- jQuery -->
-<script src="/plugins/jquery/jquery.min.js"></script>
-<!-- SweetAlert2 -->
-<script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
-
+@section('scripts')
+    @parent
 <script>
     var Toast = Swal.mixin({
         toast: true,
@@ -726,7 +723,7 @@
                     console.log('result', result);
                     // $('#no-of-days').val(result.days)
                     if (result.days > 0) {
-                        $('#no-of-days').val(result.days).focus().trigger('change');
+                        $('#no-of-days').val(result.days).trigger('change');
                         $('#daily').val(result.days);
                     }
                     $('.card').find('#overlay-wrapper3').css('display', 'none');
@@ -853,71 +850,6 @@
         printWindow.print();
     }
 
-    function printReceipt() {
-        // Get the receipt HTML element
-        const receipt = document.getElementById('rcp');
-        // Clone the receipt node so we can modify it without changing the original
-        const clonedReceipt = receipt.cloneNode(true);
-        // Remove the print button from the cloned receipt
-        const printButton = clonedReceipt.querySelector('#print-btn');
-        printButton.parentNode.removeChild(printButton);
-        // Open a new window with the cloned receipt
-        const printWindow = window.open('', 'Print Receipt');
-        printWindow.document.write(clonedReceipt.innerHTML);
-        //   printWindow.document.close();
-        // Print the receipt
-        printWindow.print();
-    }
-
-    function generateReceipt4() {
-        // Get the selected fees
-        const selectedFees = document.querySelectorAll('input[type="checkbox"]:checked');
-        console.log(typeof(selectedFees))
-        // Calculate the total amount
-        let totalAmount = 0;
-        selectedFees.forEach((fee) => {
-            totalAmount += parseFloat(fee.dataset.amount) * parseInt(fee.closest('tr').querySelector(
-                '.unit-fee').value);
-        });
-
-        // Create the receipt HTML
-        const receiptHTML = `
-        <h1>Receipt</h1>
-        <table>
-        <thead>
-            <tr>
-            <th>Fee</th>
-            <th>Amount</th>
-            <th>Unit</th>
-            <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${selectedFees.map((fee) => `
-            <tr>
-                <td>${fee.closest('td').previousElementSibling.textContent}</td>
-                <td>${fee.dataset.amount}</td>
-                <td>${fee.closest('tr').querySelector('.unit-fee').value}</td>
-                <td>${(parseFloat(fee.dataset.amount) * parseInt(fee.closest('tr').querySelector('.unit-fee').value)).toFixed(2)}</td>
-            </tr>
-            `).join('')}
-            <tr>
-            <td colspan="3"><strong>Total:</strong></td>
-            <td><strong>${totalAmount.toFixed(2)}</strong></td>
-            </tr>
-        </tbody>
-        </table>
-          `;
-
-        // Create a new window with the receipt HTML
-        const receiptWindow = window.open('', 'PRINT', 'height=600,width=800');
-        receiptWindow.document.write(`<html><head><title>Receipt</title></head><body>${receiptHTML}</body></html>`);
-
-        // Prompt the user to print the receipt
-        receiptWindow.document.close();
-        receiptWindow.focus();
-        receiptWindow.print();
-        receiptWindow.close();
-    }
 </script>
+@endsection
 @endsection

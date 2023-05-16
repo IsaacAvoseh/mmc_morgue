@@ -5,12 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FileUpload extends Model
+class Inventory extends Model
 {
     use HasFactory;
-
-    public function document(){
-        return $this->belongsTo(Document::class);
-    }
+    protected $guarded = [];
 
 }

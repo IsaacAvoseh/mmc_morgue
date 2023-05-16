@@ -48,7 +48,6 @@
                     </div>
                     <!-- /.modal-dialog -->
                 </div>
-
                 {{-- add new modal --}}
 
                 {{-- Update modal --}}
@@ -62,13 +61,12 @@
                                 </button>
                             </div>
                             <div class="modal-body">
+
                                 <div class="overlay-wrapper hidden" id="overlay-wrapper">
                                     <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
                                     </div>
                                 </div>
                                 {{-- end loading spinner --}}
-                               
-                             
                                     <input type="hidden" name="id" id="id">
                                     <div class="form-group">
                                         <label>Name</label>
@@ -110,11 +108,15 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="row justify-content-between">
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                          @if (Auth::user() && Auth::user()->type == 'admin')
+                          <button type="button" class="btn btn-primary" data-toggle="modal"
                                 data-target="#addNewModal">
                                 <i class="fa fa-plus"></i>
                                 Add New
                             </button>
+                            @else
+                            <p></p>
+                          @endif
                              <b>Available: {{ $available?? 0 }}</b>
                              <p></p>
                         </div>
@@ -134,7 +136,7 @@
                                     <th>S/N</th>
                                     <th>Rack</th>
                                     <th>Status</th>
-                                    <th>Added</th>
+                                    <th>Corpse</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>
@@ -153,16 +155,13 @@
 <!-- /.container-fluid -->
 <!-- /.content -->
 
-<!-- jQuery -->
-<script src="/plugins/jquery/jquery.min.js"></script>
-<!-- SweetAlert2 -->
-<script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
+@section('scripts')
+    @parent
 <script>
     function loading() {
         $('.card').find('#overlay-wrapper').css('display', 'block');
     }
 
-    $(function() {
         $(function() {
             var tt = 0;
             $('.card').find('#overlay-wrapper').css('display', 'none');
@@ -171,7 +170,7 @@
                 serverSide: true,
                 paging: true,
                 ordering: true,
-                pageLength: 10,
+                pageLength: 25,
                 // responsive: true,
                 info: true,
                 ajax: {
@@ -189,35 +188,25 @@
                         data: 'name'
                     },
                     {
-                        data: 'status'
+                        data: 'status',
+                        // sortable:false
                     },
                    
                     {
-                        data: 'added'
+                        data: 'corpse',
+                        sortable:false
                     },
                     {
-                        data: 'action'
+                        data: 'action',
+                        sortable:false
                     },
 
                 ],
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2')
-                .DataTable({
-                    "paging": true,
-                    "lengthChange": false,
-                    "searching": false,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                    "severSide": true,
-                    "processing": true,
-                });
 
         });
 
 
-    });
 
     function deleteConfirm(id, name) {
         Swal.fire({
@@ -292,14 +281,7 @@
     }
 
     function rack_edit() {
-        if ($('#update_modal').find('#id').val() == '') {
-            Swal.fire(
-                'Error!',
-                `Please Select Conference on Trainnig`,
-                'warning'
-            )
-            return;
-        }
+        
         let rack_id = $('#update_modal').find('#id').val();
         console.log('rack', rack_id)
         $('#update_modal').find('#overlay-wrapper').css('display', 'block');
@@ -343,4 +325,5 @@
         }
     }
 </script>
+@endsection
 @endsection

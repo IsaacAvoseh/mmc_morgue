@@ -2,7 +2,7 @@
 
 
 @section('content')
-@section('title', 'Services')
+@section('title', 'Inventory')
 <!-- Main content -->
 <div class="content">
     <div class="container-fluid">
@@ -11,74 +11,18 @@
         </p>
         <div class="row">
             <div class="col-12">
-                {{-- Add new Modal name, start and end date --}}
-                {{-- <div class="modal fade" id="addNewModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title">Add New</h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <p class="text-danger text-bold"> Please type airline correctly or copy and pase from
-                                    payment or billing excel sheet</p>
-                                <form action="{{ route('services') }}" method="POST">
-                                    @csrf
-                                    <div class="form-group">
-                                        <label>Name</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="text" name="name" value="{{ old('name') }}"
-                                                class="form-control datetimepicker-input"
-                                                placeholder="Africa World Services Limited" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Naira Opening Balance:</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="number" step=".01" name="naira_opening" min="0"
-                                                placeholder="18278666.12" value="{{ old('naira_opening') }}"
-                                                class="form-control datetimepicker-input"
-                                                data-target="#reservationdate">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>USD Opening Balance:</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="number" step=".01" name="usd_opening" min="0"
-                                                placeholder="18278666.12" class="form-control datetimepicker-input"
-                                                value="{{ old('usd_opening') }}" data-target="#reservationdate">
-                                        </div>
-                                    </div>
-
-                                    <div class="modal-footer justify-content-between">
-                                        <button type="button" class="btn btn-default"
-                                            data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
-                                </form>
-                            </div>
-
-                        </div>
-                        <!-- /.modal-content -->
-                    </div>
-                    <!-- /.modal-dialog -->
-                </div> --}}
-
-                {{-- add new modal --}}
-
                 {{-- Update modal --}}
                 <div class="modal fade" id="update_modal">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title">Update Service</h4>
+                                <h4 class="modal-title">Update Item</h4>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
+                                  {{-- loading spinner --}}
                                 <div class="overlay-wrapper hidden" id="overlay-wrapper">
                                     <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
                                     </div>
@@ -88,26 +32,27 @@
                              
                                     <input type="hidden" name="id" id="id">
                                     <div class="form-group">
-                                        <label>Name</label>
+                                        <label>Item Name</label>
                                         <div class="input-group date" id="reservationdate" data-target-input="nearest">
                                             <input type="text" name="name" id="name"
                                                 value="{{ old('name') }}" class="form-control datetimepicker-input"
                                                 placeholder="Name" required>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Price</label>
+                                       <div class="form-group">
+                                        <label>Unit of Measure</label>
                                         <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="number" price="price" id="price"
-                                                value="{{ old('price') }}" class="form-control datetimepicker-input"
-                                                placeholder="Price" required>
+                                            <input type="text" name="unit_of_measure" id="unit_of_measure"
+                                                value="{{ old('unit_of_measure') }}" class="form-control datetimepicker-input"
+                                                placeholder="" required>
                                         </div>
                                     </div>
+
                             
                                     <div class="modal-footer justify-content-between">
                                         <button type="button" class="btn btn-default"
                                             data-dismiss="modal">Close</button>
-                                        <button type="button" onclick="service_edit()"
+                                        <button type="button" onclick="edit_item()"
                                             class="btn btn-primary">Submit</button>
                                     </div>
                              
@@ -117,15 +62,76 @@
                         <!-- /.modal-content -->
                     </div>
                 </div>
+                {{-- End of update modal --}}
+    
+                {{-- Restock modal --}}
+                <div class="modal fade" id="restock">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Restock Item </h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                  {{-- loading spinner --}}
+                                <div class="overlay-wrapper hidden" id="overlay-wrapper">
+                                    <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                                    </div>
+                                </div>
+                                {{-- end loading spinner --}}
+                            
+                                    <input type="hidden" name="id" id="id">
+                                    <div class="row">
+                                        <div class="form-group col">
+                                        <label>Item Name</label>
+                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                            <input type="text" name="name" id="name"
+                                                value="{{ old('name') }}" class="form-control form-control-sm datetimepicker-input"
+                                                placeholder="Name" required readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col">
+                                        <label>Unit of Measure</label>
+                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                            <input type="text" name="unit_of_measure" id="unit_of_measure"
+                                                value="{{ old('unit_of_measure') }}" class="form-control form-control-sm datetimepicker-input"
+                                                placeholder="" required readonly>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Quatity</label>
+                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                            <input type="number" name="qty" id="qty"
+                                                value="{{ old('qty') }}" class="form-control datetimepicker-input"
+                                                placeholder="30,100 e.t." required>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="button" class="btn btn-default"
+                                            data-dismiss="modal">Close</button>
+                                        <button type="button" onclick="restock()"
+                                            class="btn btn-primary">Restock</button>
+                                    </div>
+                             
+                            </div>
 
-                <!-- /.modal-dialog -->
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                </div>
+                {{-- End of Restock modal --}}
+    
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
                         <div class="col-md-4">
                             <div class="row justify-content-between">
                             <button type="button" class="btn btn-primary" onclick="showUpload()">
-                                <i class="fa fa-plus"></i>
+                                {{-- <i class="fa fa-plus"></i> --}}
                                 Add New
                             </button>
                         </div>
@@ -140,31 +146,31 @@
                        <div class="col-md-8">
                          <div class="row">
                             <span class="" hidden id="show_upload">
-                                <form action="{{ route('services') }}" onsubmit="loading()" class=""
+                                <form action="{{ route('inventory') }}" onsubmit="loading()" class=""
                                     method="post">
                                     @csrf
                                     <div class="row d-flex justify-content-center">
                                         <div class="col">
                                             <div class="form-group">
-                                                <label>Name:</label>
+                                                <label>Item Name:</label>
                                                 <div class="input-group date" id="reservationdate"
                                                     data-target-input="nearest">
                                                     <input type="text" name="name" id="name"
                                                         value="{{ old('name') }}"
                                                         class="form-control datetimepicker-input"
-                                                        placeholder="Name of service" required>
+                                                        placeholder="Name of item" required>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col">
                                             <div class="form-group">
-                                                <label>Price:</label>
+                                                <label>Unit of Measure:</label>
                                                 <div class="input-group date" id="reservationdate"
                                                     data-target-input="nearest">
-                                                    <input type="number" name="price" id="price"
-                                                        value="{{ old('price') }}"
+                                                    <input type="text" name="unit_of_measure" id="unit_of_measure"
+                                                        value="{{ old('unit_of_measure') }}"
                                                         class="form-control datetimepicker-input"
-                                                        placeholder="Price" required>
+                                                        placeholder="i.e piece,litres e.t." required>
                                                 </div>
                                             </div>
                                         </div>
@@ -172,7 +178,7 @@
                                             <div class="form-group">
                                                 <label for="">Submit</label>
                                             <button type="submit" class="btn btn-success">
-                                                <i class="fa fa-plus"></i>
+                                                <i class="fa fa-circle"></i>
                                                 Submit
                                             </button>
                                             </div>  
@@ -191,9 +197,12 @@
                                 <tr>
                                     <th>S/N</th>
                                     <th>Name</th>
-                                    <th>Price</th>
-                                    <th>Added</th>
-                                    <th>ACTION</th>
+                                    <th>Unit of Measure</th>
+                                    <th>Updated</th>
+                                    <th>Total Stock In</th>
+                                    <th>Total Stock Out</th>
+                                    <th>Balance</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -219,19 +228,19 @@
     }
 
     $(function() {
-            var tt = 0;
+
             $('.card').find('#overlay-wrapper').css('display', 'none');
             $("#example1").DataTable({
                 processing: true,
                 serverSide: true,
                 paging: true,
                 ordering: true,
-                pageLength: 50,
+                pageLength: 25,
                 // responsive: true,
                 info: true,
                 ajax: {
                     type: "GET",
-                    url: "{{ route('get_services') }}",
+                    url: "{{ route('get_inventory') }}",
                     dataSrc: function(data) {
                         return data.aaData
                     }
@@ -244,10 +253,19 @@
                         data: 'name'
                     },
                     {
-                        data: 'price'
+                        data: 'unit_of_measure'
                     },
                     {
-                        data: 'added'
+                        data: 'updated'
+                    },
+                    {
+                        data: 'total_in_stock'
+                    },
+                    {
+                        data: 'total_out_stock'
+                    },
+                    {
+                        data: 'balance'
                     },
 
                     {
@@ -256,7 +274,7 @@
 
                 ],
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-     });
+    });
 
     function deleteConfirm(id, name) {
         Swal.fire({
@@ -271,7 +289,7 @@
             if (result.isConfirmed) {
                 // confirm('Are you sure ?')
                 $.ajax({
-                    url: "{{ route('delete_service') }}",
+                    url: "{{ route('delete_item') }}",
                     type: 'DELETE',
                     data: {
                         _token: "{{ csrf_token() }}",
@@ -298,12 +316,43 @@
         })
     }
 
-       function get_service(id) {
-        // open modal and send request to get conference data
+    function get_item1(id){
+         // open modal and send request to get conference data
+        $('#restock').modal('show');
+        $('#restock').find('#overlay-wrapper').css('display', 'block');
+        $.ajax({
+            url: "{{ route('get_item') }}",
+            type: 'GET',
+            data: {
+                _token: "{{ csrf_token() }}",
+                id: id
+            },
+            success: function(result) {
+                console.log(result);
+                $('#restock').find('#overlay-wrapper').css('display', 'none');
+                $('#restock').find('#name').val(result?.data?.name);
+                $('#restock').find('#unit_of_measure').val(result?.data?.unit_of_measure);
+                $('#restock').find('#id').val(result?.data?.id);
+             
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                $('#restock').find('#overlay-wrapper').css('display', 'none');
+                Swal.fire(
+                    'Error!',
+                    'Something went wrong.',
+                    'error'
+                )
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function get_item(id){
+         // open modal and send request to get conference data
         $('#update_modal').modal('show');
         $('#update_modal').find('#overlay-wrapper').css('display', 'block');
         $.ajax({
-            url: "{{ route('get_service') }}",
+            url: "{{ route('get_item') }}",
             type: 'GET',
             data: {
                 _token: "{{ csrf_token() }}",
@@ -312,15 +361,10 @@
             success: function(result) {
                 console.log(result);
                 $('#update_modal').find('#overlay-wrapper').css('display', 'none');
-                $('#update_modal').find('#name').val(result?.data?.name);
-                $('#update_modal').find('#price').val(result?.data?.price);
+                 $('#update_modal').find('#name').val(result?.data?.name);
+                $('#update_modal').find('#unit_of_measure').val(result?.data?.unit_of_measure);
                 $('#update_modal').find('#id').val(result?.data?.id);
-                if(result?.data?.name == 'Embalmment' || result?.data?.name == 'Daily Fee'){
-                    $('#update_modal').find('#name').attr('readonly', true);
-                }else{
-                    $('#update_modal').find('#name').attr('readonly', false);
-
-                }
+             
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 Swal.fire(
@@ -333,19 +377,18 @@
         });
     }
 
-    function service_edit() {
-    
-        let service_id = $('#update_modal').find('#id').val();
-        console.log('service', service_id)
+    function edit_item(id){
+           let item_id = $('#update_modal').find('#id').val();
+            console.log('item', item_id)
         $('#update_modal').find('#overlay-wrapper').css('display', 'block');
         $.ajax({
-            url: "{{ route('service_edit') }}",
+            url: "{{ route('edit_item') }}",
             type: 'PUT',
             data: {
                 _token: "{{ csrf_token() }}",
-                service_id: $('#update_modal').find('#id').val(),
+                item_id: $('#update_modal').find('#id').val(),
                 name: $('#update_modal').find('#name').val(),
-                price: $('#update_modal').find('#price').val(),
+                unit_of_measure: $('#update_modal').find('#unit_of_measure').val(),
             },
             success: function(result) {
                 console.log('resu;t', result);
@@ -369,6 +412,42 @@
         });
 
     }
+
+    function restock(id){
+           let item_id = $('#restock').find('#id').val();
+            console.log('item', item_id)
+        $('#restock').find('#overlay-wrapper').css('display', 'block');
+        $.ajax({
+            url: "{{ route('restock_item') }}",
+            type: 'PUT',
+            data: {
+                _token: "{{ csrf_token() }}",
+                item_id: $('#restock').find('#id').val(),
+                qty: $('#restock').find('#qty').val(),
+            },
+            success: function(result) {
+                console.log('resu;t', result);
+                $('#restock').find('#overlay-wrapper').css('display', 'none');
+                Swal.fire(
+                    'Success!',
+                    `${result?.success} `,
+                    'success'
+                )
+                location.reload();
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                Swal.fire(
+                    'Error!',
+                    `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!' }`,
+                    'error'
+                )
+                $('#restock').find('#overlay-wrapper').css('display', 'none');
+                console.log(XMLHttpRequest);
+            }
+        });
+
+    }
+
     function showUpload() {
         if ($('#show_upload').attr('hidden')) {
             $('#show_upload').attr('hidden', false);

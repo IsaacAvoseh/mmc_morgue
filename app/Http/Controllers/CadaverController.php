@@ -264,7 +264,7 @@ class CadaverController extends Controller
 
         // Total records
         $totalRecords = Corpse::select('count(*) as allcount')->where('status', 'admitted')->count();
-        $totalRecordswithFilter = Corpse::select('count(*) as allcount')->where('status', 'admitted')->where('name', 'like', '%' . $searchValue . '%')->count();
+        $totalRecordswithFilter = Corpse::select('count(*) as allcount')->where('name', 'like', '%' . $searchValue . '%')->where('status', 'admitted')->count();
 
         // Fetch records
         $records = Corpse::orderBy($columnName?? 'created_at', 'desc')
@@ -287,6 +287,7 @@ class CadaverController extends Controller
             $date_received = $record->date_received;
             $date_to = $record->date_to;
             $relation = $record->family_rep1_name ?? $record->family_rep2_name;
+            $rack = DB::table('racks')->where('id', $record->rack_id)->get()->last()->name ?? 'None';
 
             $data_arr[] = array(
                 "id" => ($start / $rowperpage) * $rowperpage + $key + 1,
@@ -296,8 +297,9 @@ class CadaverController extends Controller
                 "age" => $age,
                 "date_received" => $date_received,
                 "date_to" => $date_to,
+                "rack" => $rack,
                 "action" => '<div class="d-flex justify-content-center">
-                                            <a class="btn btn-primary m-2" href=' . $view_route . '?id=' . base64_encode($id) . '> <i class="fa fa-eye"></i> View Details</a>
+                                            <a class="btn btn-primary m-2" href=' . $view_route . '?id=' . base64_encode($id) . '> <i class="fa fa-eye"></i> View </a>
                                             <a class="btn btn-success m-2" href=' . $release_route . '?id=' . base64_encode($id) . '> <i class="fa fa-sign-out-alt"></i> Release</a>
                                  </div>',
             );
@@ -318,7 +320,9 @@ class CadaverController extends Controller
     {
         if ($request->id) {
             $corpse = Corpse::find(base64_decode($request->id));
-            return view('corpses.view', ['data' => $corpse]);
+            $files = FileUpload::where('corpse_id', base64_decode($request->id))->with('document')->get();
+            // dd($files);
+            return view('corpses.view', ['data' => $corpse, 'files' => $files]);
         } else {
             return back()->withErrors('Something went wrong!');
         }
@@ -606,4 +610,225 @@ class CadaverController extends Controller
             return back()->withErrors('Something went wrong!');
         }
     }
+
+    public function view_by_due_and_to_be_collected_this_month(){
+        return view('corpses.view_by_due_and_to_be_collected_this_month');
+    }
+
+    public function get_view_by_due_and_to_be_collected_this_month(Request $request)
+    {
+        // dd($request->all());
+        $draw = $request->get('draw');
+        $start = $request->get("start");
+        $rowperpage = $request->get("length"); // Rows display per page
+
+        $columnIndex_arr = $request->get('order');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+
+        $columnIndex = $columnIndex_arr[0]['column']; // Column index
+        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
+        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['desc']; // asc or desc
+        $searchValue = $search_arr['value']; // Search value
+
+        if($request->stats == 'due'){
+            // Total records
+            $totalRecords = Corpse::select('count(*) as allcount')->where('status', 'admitted')->whereDate('date_to', '<=', now())->count();
+            $totalRecordswithFilter = Corpse::select('count(*) as allcount')->where('status', 'admitted')->whereDate('date_to', '<=', now())->where('name', 'like', '%' . $searchValue . '%')->count();
+
+            // Fetch records
+            $records = Corpse::orderBy($columnName ?? 'created_at', 'desc')
+                ->where('name', 'like', '%' . $searchValue . '%')
+                ->where('status', 'admitted')
+                ->whereDate('date_to', '<=', now())
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+            
+        }
+
+        if($request->stats == 'collect'){
+            // Total records
+            $totalRecords = Corpse::select('count(*) as allcount')->where('status', 'admitted')->whereRaw('MONTH(date_to) = ?', [now()->format('m')])->count();
+            $totalRecordswithFilter = Corpse::select('count(*) as allcount')->where('status', 'admitted')->whereRaw('MONTH(date_to) = ?', [now()->format('m')])->where('name', 'like', '%' . $searchValue . '%')->count();
+
+            // Fetch records
+            $records = Corpse::orderBy($columnName ?? 'created_at', 'desc')
+                ->where('name', 'like', '%' . $searchValue . '%')
+                ->where('status', 'admitted')
+                ->whereRaw('MONTH(date_to) = ?', [now()->format('m')])
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+
+        }
+
+        // dd($records);
+        $data_arr = array();
+        $view_route = route('get_corpse');
+        $release_route = route('release');
+        foreach ($records as $key => $record) {
+
+            $id = $record->id;
+            $name = $record->name;
+            $age = $record->age;
+            $sex = $record->sex;
+            $date_received = $record->date_received;
+            $date_to = $record->date_to;
+            $relation = $record->family_rep1_name ?? $record->family_rep2_name;
+            $rack = DB::table('racks')->where('id', $record->rack_id)->get()->last()->name ?? 'None';
+
+            $data_arr[] = array(
+                "id" => ($start / $rowperpage) * $rowperpage + $key + 1,
+                "name" => $name,
+                "relation" => $relation,
+                "sex" => $sex,
+                "age" => $age,
+                "date_received" => $date_received,
+                "date_to" => $date_to,
+                "rack" => $rack,
+                "action" => '<div class="d-flex justify-content-center">
+                                            <a class="btn btn-primary m-2" href=' . $view_route . '?id=' . base64_encode($id) . '> <i class="fa fa-eye"></i> View </a>
+                                            <a class="btn btn-success m-2" href=' . $release_route . '?id=' . base64_encode($id) . '> <i class="fa fa-sign-out-alt"></i> Release</a>
+                                 </div>',
+            );
+        }
+
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordswithFilter,
+            "aaData" => $data_arr
+        );
+
+        echo json_encode($response);
+        exit;
+    }
+
+     public function reports(){
+        return view('corpses.reports');
+    }
+    public function get_reports(Request $request)
+    {
+        // dd($request->all());
+        $draw = $request->get('draw');
+        $start = $request->get("start");
+        $rowperpage = $request->get("length"); // Rows display per page
+
+        $columnIndex_arr = $request->get('order');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+
+        $columnIndex = $columnIndex_arr[0]['column']; // Column index
+        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
+        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['desc']; // asc or desc
+        $searchValue = $search_arr['value']; // Search value
+
+        // Set default start and end dates
+        $start_date = Carbon::today()->startOfDay();
+        $end_date = Carbon::today()->endOfDay();
+
+        // Check if start date and end date are present in the request
+        if (request()->has('start_date') && request()->has('end_date')
+        ) {
+            $start_date = Carbon::createFromFormat('Y-m-d', request()->input('start_date'))->startOfDay();
+            $end_date = Carbon::createFromFormat('Y-m-d', request()->input('end_date'))->endOfDay();
+        }
+
+        // Total records
+        $totalRecords = Corpse::select('count(*) as allcount')
+        ->where(function ($query) use ($start_date, $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date])
+            ->orWhereBetween('updated_at', [$start_date, $end_date]);
+        })
+        ->count();
+
+        $totalRecordswithFilter = Corpse::select('count(*) as allcount')
+        ->where(function ($query) use ($start_date, $end_date, $searchValue) {
+            $query->where('name', 'like', '%' . $searchValue . '%')
+            ->where(function ($query) use ($start_date, $end_date) {
+                $query->whereBetween('created_at', [$start_date, $end_date])
+                ->orWhereBetween('updated_at', [$start_date, $end_date]);
+            });
+        })
+        ->count();
+
+        $records = Corpse::orderBy($columnName ?? 'created_at', 'desc')
+        ->where('name', 'like', '%' . $searchValue . '%')
+        ->where(function ($query) use ($start_date, $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date])
+            ->orWhereBetween('updated_at', [$start_date, $end_date]);
+        })
+        ->skip($start)
+        ->take($rowperpage)
+        ->get();
+
+        $data_arr = array();
+        $total = Corpse::select('count(*) as allcount')
+        ->where(function ($query) use ($start_date, $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date])
+            ->orWhereBetween('updated_at', [$start_date, $end_date]);
+        })
+        ->count();
+
+        $admitted = Corpse::select('count(*) as allcount')
+        ->where('status', 'admitted')
+        ->where(function ($query) use ($start_date, $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date])
+            ->orWhereBetween('updated_at', [$start_date, $end_date]);
+        })
+        ->count();
+
+        $released = Corpse::select('count(*) as allcount')
+        ->where('status', 'released')
+        ->where(function ($query) use ($start_date, $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date])
+            ->orWhereBetween('updated_at', [$start_date, $end_date]);
+        })
+        ->count();
+
+
+        foreach ($records as $key => $record) {
+
+            $id = $record->id;
+            $name = $record->name;
+            $age = $record->age;
+            $sex = $record->sex;
+            $date_received = $record->date_received;
+            $date_to = $record->date_to;
+            $relation = $record->family_rep1_name ?? $record->family_rep2_name;
+            $rack = DB::table('racks')->where('id', $record->rack_id)->get()->last()->name ?? 'None';
+            $status = $record->status;
+
+            $data_arr[] = array(
+                "id" => ($start / $rowperpage) * $rowperpage + $key + 1,
+                "name" => $name,
+                "relation" => $relation,
+                "sex" => $sex,
+                "age" => $age,
+                "date_received" => $date_received,
+                "date_to" => $date_to,
+                "rack" => $rack,
+                "status" => ucfirst($status),
+            );
+        }
+
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordswithFilter,
+            "aaData" => $data_arr,
+            "total" => $total,
+            "admitted" => $admitted,
+            "released" => $released,
+        );
+
+        echo json_encode($response);
+        exit;
+    }
+
 }

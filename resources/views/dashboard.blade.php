@@ -79,7 +79,7 @@
 
             <!-- /.col -->
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('corpses') }}">
+                <a style="color: inherit" href="{{ route('view_by_due_and_to_be_collected_this_month', ['stats' => 'collect']) }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-warning"><i class="fas fa-chalkboard-teacher"></i></span>
                         <div class="info-box-content">
@@ -95,7 +95,7 @@
 
             <!-- /.col -->
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('corpses') }}">
+                <a style="color: inherit" href="{{ route('view_by_due_and_to_be_collected_this_month',['stats' => 'due']) }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-danger"><i class="fas fa-chalkboard-teacher"></i></span>
                         <div class="info-box-content">
@@ -110,8 +110,9 @@
             <!-- /.col -->
 
             <!-- /.col -->
+            @if (Auth::user() && Auth::user()->type == 'admin')
             <div class="col-md-3 col-sm-6 col-12">
-                <a style="color: inherit" href="{{ route('corpses') }}">
+                <a style="color: inherit" href="{{ route('payment_history') }}">
                     <div class="info-box">
                         <span class="info-box-icon bg-info"><i class="fas fa-money-check-alt"></i></span>
                         <div class="info-box-content">
@@ -141,6 +142,7 @@
                 </a>
                 <!-- /.info-box -->
             </div>
+                @endif
             <!-- /.col -->
         </div>
         <!-- /.row -->
@@ -148,7 +150,7 @@
             <div class="card-header border-0">
                 <div class="d-flex justify-content-between">
                     <h3 class="card-title">Entries Per day</h3>
-                    <a href="javascript:void(0);">View Report</a>
+                    {{-- <a href="javascript:void(0);">View Report</a> --}}
                 </div>
             </div>
             <div class="card-body">
@@ -194,14 +196,9 @@
 <!-- /.content -->
 
   
-<script>
-    function showUpload() {
-        if ($('#show_upload').attr('hidden')) {
-            $('#show_upload').attr('hidden', false);
-        } else {
-            $('#show_upload').attr('hidden', true);
-
-        }
-    }
-</script>
+@section('scripts')
+    @parent
+     <script src="/plugins/chart.js/Chart.min.js" ></script>
+    <script src="/dist/js/pages/dashboard3.js"></script>
+@endsection
 @endsection
