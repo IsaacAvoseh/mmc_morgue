@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="/dist/css/adminlte.min.css">
 </head>
 
-<body class="hold-transition login-page" style="background: url('/login.webp') no-repeat;">
+<body class="hold-transition login-page" style="background: url('login.webp') no-repeat;">
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-success">

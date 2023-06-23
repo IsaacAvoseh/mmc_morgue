@@ -9,6 +9,7 @@ class ExpenseCategoryController extends Controller
 {
 public function expense_category(Request $request)
     {
+        // dd(session()->all());
 
         if ($request->isMethod('POST')) {
             $request->validate([

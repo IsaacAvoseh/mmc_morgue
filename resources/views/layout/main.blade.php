@@ -42,14 +42,37 @@
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <!-- Left navbar links -->
-            <ul class="navbar-nav">
+            <ul class="navbar-nav loading_test">
+                {{-- lodaing spinner --}}
+                <div class="overlay-wrapper" hidden id="overlay-wrapper">
+                    <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                    </div>
+                </div>
+                {{-- end loading spinner --}}
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
                             class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link">{{ Auth::user()->name ?? 'Admin' }}</a>
+                    <a href="#" class="nav-link">{{ Auth::user()->name ?? 'Admin' }} ( {{ucfirst(session()->get('user_type')) }} )</a>
                 </li>
+                @if (Auth::user() && Auth::user()->type == 'admin')
+                    <li class="nav-item d-none d-sm-inline-block">
+                        <select class="form-control form-control-sm" name="user_type" id="user_type"
+                            style="width: 100%;" required>
+                            {{-- @forelse (\App\Models\User::distinct()->get('type') as $type)
+                                <option value="{{ $type->type }}">{{ ucfirst($type->type) ?? '-' }}
+                                </option>
+                            @empty
+                                <option value="">Not availbe</option>
+                            @endforelse --}}
+                            <option selected="selected" value="">Select</option>
+                            <option value="reception">Reception</option>
+                            <option value="accounts">Accounts</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </li>
+                @endif
 
             </ul>
 
@@ -84,200 +107,215 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
-                with font-awesome or any other icon font library -->
-                        <li class="nav-item">
-                            <a href="{{ route('dashboard') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/dashboard'? 'active': '' }}">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Dashboard
-                                    <i class="right"></i>
-                                </p>
-                            </a>
+                        with font-awesome or any other icon font library -->
+                        @if (Auth::user() && Auth::user()->type != 'none')
+                            <li class="nav-item">
+                                <a href="{{ route('dashboard') }}"
+                                    class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/dashboard'? 'active': '' }}">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>
+                                        Dashboard
+                                        <i class="right"></i>
+                                    </p>
+                                </a>
 
-                        </li>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('corpses') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/corpses'? 'active': '' }}">
-                                <i class="nav-icon fas fa-bed"></i>
-                                <p>
-                                    Corpses
-                                </p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('corpses') }}"
+                                    class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/corpses'? 'active': '' }}">
+                                    <i class="nav-icon fas fa-bed"></i>
+                                    <p>
+                                        Corpses
+                                    </p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admit') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/corpses/admit'? 'active': '' }}">
+                            <li class="nav-item">
+                                <a href="{{ route('admit') }}"
+                                    class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/corpses/admit'? 'active': '' }}">
 
-                                <i class="nav-icon fas fa-file-invoice"></i>
-                                <p>
-                                    Admit
-                                </p>
-                            </a>
-                        </li>
+                                    <i class="nav-icon fas fa-file-invoice"></i>
+                                    <p>
+                                        Admit
+                                    </p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('release_list') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/release_list'? 'active': '' }}">
+                            <li class="nav-item">
+                                <a href="{{ route('release_list') }}"
+                                    class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/release_list'? 'active': '' }}">
 
-                                <i class="nav-icon  fas fa-sign-out-alt"></i>
+                                    <i class="nav-icon  fas fa-sign-out-alt"></i>
 
-                                <p>
-                                    Released
-                                </p>
-                            </a>
-                        </li>
+                                    <p>
+                                        Released
+                                    </p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('reports') }}"
-                                class="nav-link {{ request()->route() && request()->route()->uri() == 'admin/reports'? 'active': '' }}">
-                                <i class="nav-icon  fas fa-folder-open"></i>
-                                <p>
-                                    Reports
-                                </p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('reports') }}"
+                                    class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/reports'? 'active': '' }}">
+                                    <i class="nav-icon  fas fa-folder-open"></i>
+                                    <p>
+                                        Reports
+                                    </p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('racks') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/racks'? 'active': '' }}">
-                                <i class="nav-icon fas fa-truck-loading"></i>
-                                <p>
-                                    Racks
-                                </p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('racks') }}"
+                                    class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/racks'? 'active': '' }}">
+                                    <i class="nav-icon fas fa-truck-loading"></i>
+                                    <p>
+                                        Racks
+                                    </p>
+                                </a>
+                            </li>
 
-                        @if (Auth::user() && Auth::user()->type == 'admin')
-                        <li class="nav-item">
-                            <a href="{{ route('services') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/services'? 'active': '' }}">
-                                <i class="nav-icon fas fa-poll-h"></i>
-                                <p>
-                                    Services
-                                </p>
-                            </a>
-                        </li>
+                            @if (Auth::user() && session()->get('user_type') == 'admin')
+                                <li class="nav-item">
+                                    <a href="{{ route('services') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/services'? 'active': '' }}">
+                                        <i class="nav-icon fas fa-poll-h"></i>
+                                        <p>
+                                            Services
+                                        </p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('documents') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/documents'? 'active': '' }}">
-                                <i class="nav-icon fas fa-folder-open"></i>
-                                <p>
-                                    Documents
-                                </p>
-                            </a>
-                        </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('documents') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/documents'? 'active': '' }}">
+                                        <i class="nav-icon fas fa-folder-open"></i>
+                                        <p>
+                                            Documents
+                                        </p>
+                                    </a>
+                                </li>
+                            @endif
+
+                            <li class="nav-item">
+                                <a href="{{ route('payment_history') }}"
+                                    class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/payment_history'? 'active': '' }}">
+                                    <i class="nav-icon fas fa-money-check-alt"></i>
+                                    <p>
+                                        Payment History
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item {{ (request()->route() &&(request()->route()->uri() == 'admin/inventory' ||request()->route()->uri() == 'admin/item_request' ||request()->route()->uri() == 'admin/request_list' ||request()->route()->uri() == 'admin/inventory/history' ||request()->route()->uri() == 'admin/inventory/expenses')? 'menu-open': '' ||(request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'))? 'menu-open': '' }}"
+                                id="inventory">
+                                <a href="#"
+                                    class="nav-link {{ (request()->route() &&(request()->route()->uri() == 'admin/inventory' ||request()->route()->uri() == 'admin/item_request' ||request()->route()->uri() == 'admin/request_list' ||request()->route()->uri() == 'admin/inventory/history' ||request()->route()->uri() == 'admin/inventory/expenses')? 'active': '' ||(request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'))? 'active': '' }}">
+                                    <i class="nav-icon fas fa-warehouse"></i>
+                                    <p>
+                                        Inventory
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('inventory') }}"
+                                            class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory'? 'active': '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>
+                                                Inventory
+                                            </p>
+                                        </a>
+                                    </li>
+
+                                    @if(Auth::user() && session()->get('user_type') != 'admin')
+                                    <li class="nav-item">
+                                        <a href="{{ route('item_request') }}"
+                                            class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/item_request'? 'active': '' }}">
+                                            <i class="far fa-circle nav-icon text-primary"></i>
+                                            <p>
+                                                Requisition
+                                            </p>
+                                        </a>
+                                    </li>
+                                    @endif
+
+                                    @if (Auth::user() && session()->get('user_type') == 'admin')
+                                        <li class="nav-item">
+                                            <a href="{{ route('request_list') }}"
+                                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/request_list'? 'active': '' }}">
+                                                <i class="far fa-circle nav-icon text-warning"></i>
+                                                <p>
+                                                    Requests
+                                                </p>
+                                            </a>
+                                        </li>
+                                    @endif
+
+                                    <li class="nav-item">
+                                        <a href="{{ route('history') }}"
+                                            class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/history'? 'active': '' }}">
+                                            <i class="far fa-circle nav-icon text-success"></i>
+                                            <p>
+                                                History
+                                            </p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="{{ route('expenses') }}"
+                                            class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/expenses'? 'active': '' }}">
+                                            <i class="far fa-circle nav-icon text-danger"></i>
+                                            <p>
+                                                Expense Journal
+                                            </p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="{{ route('expense_category') }}"
+                                            class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'? 'active': '' }}">
+                                            <i class="far fa-circle nav-icon text-secondary"></i>
+                                            <p>
+                                                Expense Category
+                                            </p>
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </li>
+
+                            @if (Auth::user() && session()->get('user_type') == 'admin')
+                                <li class="nav-item">
+                                    <a href="{{ route('users') }}"
+                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/users'? 'active': '' }}">
+                                        <i class="nav-icon fas fa-users"></i>
+                                        <p>
+                                            Users
+                                        </p>
+                                    </a>
+                                </li>
+                            @endif
+                             <li class="nav-item">
+                                <a href="{{ route('logout') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                                    <p>
+                                        Log Out
+
+                                    </p>
+                                </a>
+                            </li>
+                        @else
+                            {{-- Log out --}}
+                            <li class="nav-item">
+                                <a href="{{ route('logout') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                                    <p>
+                                        Log Out
+
+                                    </p>
+                                </a>
+                            </li>
                         @endif
-
-                        <li class="nav-item">
-                            <a href="{{ route('payment_history') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/payment_history'? 'active': '' }}">
-                                <i class="nav-icon fas fa-money-check-alt"></i>
-                                <p>
-                                    Payment History
-                                </p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item {{ request()->route() && (request()->route()->uri() == 'admin/inventory' || request()->route()->uri() == 'admin/item_request' || request()->route()->uri() == 'admin/request_list' || request()->route()->uri() == 'admin/inventory/history' || request()->route()->uri() == 'admin/inventory/expenses') ? 'menu-open' : '' ||  request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'? 'menu-open': '' }}" id="inventory">
-                                <a href="#" class="nav-link {{ request()->route() && (request()->route()->uri() == 'admin/inventory' || request()->route()->uri() == 'admin/item_request' || request()->route()->uri() == 'admin/request_list' || request()->route()->uri() == 'admin/inventory/history' || request()->route()->uri() == 'admin/inventory/expenses') ? 'active' : '' ||  request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'? 'active': '' }}">
-                                <i class="nav-icon fas fa-warehouse"></i>
-                                <p>
-                                    Inventory
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('inventory') }}"
-                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory'? 'active': '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>
-                                            Inventory
-                                        </p>
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a href="{{ route('item_request') }}"
-                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/item_request'? 'active': '' }}">
-                                        <i class="far fa-circle nav-icon text-primary"></i>
-                                        <p>
-                                            Requisition
-                                        </p>
-                                    </a>
-                                </li>
-
-                                @if (Auth::user() && Auth::user()->type == 'admin')
-                                <li class="nav-item">
-                                    <a href="{{ route('request_list') }}"
-                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/request_list'? 'active': '' }}">
-                                        <i class="far fa-circle nav-icon text-warning"></i>
-                                        <p>
-                                            Requests
-                                        </p>
-                                    </a>
-                                </li>
-                                @endif
-
-                                <li class="nav-item">
-                                    <a href="{{ route('history') }}"
-                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/history'? 'active': '' }}">
-                                        <i class="far fa-circle nav-icon text-success"></i>
-                                        <p>
-                                            History
-                                        </p>
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a href="{{ route('expenses') }}"
-                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/expenses'? 'active': '' }}">
-                                        <i class="far fa-circle nav-icon text-danger"></i>
-                                        <p>
-                                            Expense Journal
-                                        </p>
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a href="{{ route('expense_category') }}"
-                                        class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/inventory/expense_category'? 'active': '' }}">
-                                        <i class="far fa-circle nav-icon text-secondary"></i>
-                                        <p>
-                                            Expense Category
-                                        </p>
-                                    </a>
-                                </li>
-
-                            </ul>
-                        </li>
-
-                      @if (Auth::user() && Auth::user()->type == 'admin')
-                        <li class="nav-item">
-                            <a href="{{ route('users') }}"
-                                class="nav-link {{ request()->route() &&request()->route()->uri() == 'admin/users'? 'active': '' }}">
-                                <i class="nav-icon fas fa-users"></i>
-                                <p>
-                                    Users
-                                </p>
-                            </a>
-                        </li>
-                        @endif
-                        {{-- Log out --}}
-                        <li class="nav-item">
-                            <a href="/logout" class="nav-link">
-                                <i class="nav-icon fas fa-sign-out-alt"></i>
-                                <p>
-                                    Log Out
-
-                                </p>
-                            </a>
-                        </li>
-
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -357,8 +395,53 @@
     <script src="/plugins/pdfmake/pdfmake.min.js"></script>
     <script src="/plugins/pdfmake/vfs_fonts.js"></script>
 
-     @yield('scripts')
-  
+    <script>
+          var Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000
+    });
+        $('#user_type').change(function() {
+            $('.loading_test').find('#overlay-wrapper').attr('hidden', false);
+            const user_type = $(this).val();
+            console.log('user tyoe', user_type)
+            // Make the AJAX request
+            $.ajax({
+                url: "{{ route('switch_user') }}",
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    user_type: user_type,
+                    _token: "{{ csrf_token() }}",
+                }),
+                success: function(response) {
+                    // Request was successful, handle the response here
+                    Toast.fire({
+                        icon: 'success',
+                        title: `${response?.message?? 'Something went wrong!'}`
+                    })
+                    $('.loading_test').find('#overlay-wrapper').attr('hidden', true);
+                    console.log(response);
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    $('.loading_test').find('#overlay-wrapper').attr('hidden', true);
+                    Swal.fire(
+                        'Error!',
+                        `${result?.message?? 'Something went wrong!'}`,
+                        // `Something went wrong!.`,
+                        'error'
+                    )
+                    // Request failed, handle the error here
+                    console.error('Request failed. Status:', xhr.status);
+                }
+            });
+        });
+    </script>
+
+    @yield('scripts')
+
 
 </body>
 

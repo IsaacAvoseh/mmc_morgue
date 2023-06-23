@@ -31,7 +31,7 @@
                                                 class="form-control datetimepicker-input" placeholder="Name" required>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="form-group">
                                         <label>Email:</label>
                                         <div class="input-group date" id="reservationdate" data-target-input="nearest">
@@ -41,18 +41,19 @@
                                         </div>
                                     </div>
 
-                                     <div class="form-group">
-                                                <label>User Type</label>
-                                                <select class="form-control select2 select2-hidden-accessible"
-                                                    style="width: 100%;" data-select2-id="1" tabindex="-1"
-                                                    aria-hidden="true" name="type" required>
-                                                    <option selected="selected" value="" >Select</option>
-                                                    <option value="reception">Reception</option>
-                                                    <option value="accounts">Accounts</option>
-                                                    <option value="admin">Admin</option>
-                                                    
-                                                </select>
-                                            </div>
+                                    <div class="form-group">
+                                        <label>User Type</label>
+                                        <select class="form-control select2 select2-hidden-accessible"
+                                            style="width: 100%;" data-select2-id="1" tabindex="-1" aria-hidden="true"
+                                            name="type" required>
+                                            <option selected="selected" value="">Select</option>
+                                            <option value="none">None</option>
+                                            <option value="reception">Reception</option>
+                                            <option value="accounts">Accounts</option>
+                                            <option value="admin">Admin</option>
+
+                                        </select>
+                                    </div>
 
                                     <div class="form-group">
                                         <label>Password:</label>
@@ -108,7 +109,8 @@
                                     <label>Name</label>
                                     <div class="input-group date" id="reservationdate" data-target-input="nearest">
                                         <input type="text" name="name" id="name"
-                                            class="form-control datetimepicker-input" placeholder="User Name" required>
+                                            class="form-control datetimepicker-input" placeholder="User Name"
+                                            required>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -118,6 +120,19 @@
                                             class="form-control datetimepicker-input" data-target="#reservationdate"
                                             required>
                                     </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>User Type</label>
+                                    <select class="form-control select2 select2-hidden-accessible"
+                                        style="width: 100%;" data-select2-id="1" tabindex="-1" aria-hidden="true"
+                                        name="type" id="type" required>
+                                        <option value="reception">Reception</option>
+                                        <option value="accounts">Accounts</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="none">None</option>
+
+                                    </select>
                                 </div>
 
                                 <div class="modal-footer justify-content-between">
@@ -225,7 +240,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $user->name ?? '-' }}</td>
                                         <td>{{ $user->email ?? '-' }}</td>
-                                        <td>{{ ucfirst($user->type)?? '-' }}</td>
+                                        <td>{{ ucfirst($user->type) ?? '-' }}</td>
                                         <td>
                                             <div class="flex">
 
@@ -262,180 +277,189 @@
 
 @section('scripts')
     @parent
-<script>
-    $(function() {
-        $("#example1").DataTable({
-            "responsive": true,
-            "lengthChange": false,
-            "autoWidth": false,
-            // "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-    });
-
-    function deleteConfirm(id, name) {
-        Swal.fire({
-            title: `Are you sure you want to delete ${name}?`,
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "{{ route('delete_user') }}",
-                    type: 'DELETE',
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        id: id
-                    },
-                    success: function(result) {
-                        Swal.fire(
-                            'Deleted!',
-                            `${result?.success}.`,
-                            'success'
-                        )
-                        location.reload();
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        Swal.fire(
-                            'Error Deleting User !',
-                            `${XMLHttpRequest.responseJSON.error}.`,
-                            'error'
-                        )
-                        console.log(XMLHttpRequest, textStatus, errorThrown);
-                    }
-                });
-            }
-        })
-    }
-
-    function get_user(id) {
-        // open modal and send request to get conference data
-        $('#update_modal').modal('show');
-        $('#overlay-wrapper').css('display', 'block');
-        $.ajax({
-            url: "{{ route('get_user') }}",
-            type: 'GET',
-            data: {
-                _token: "{{ csrf_token() }}",
-                id: id
-            },
-            success: function(result) {
-                console.log(result);
-                $('#overlay-wrapper').css('display', 'none');
-                $('#update_modal').find('#name').val(result?.data?.name);
-                $('#update_modal').find('#email').val(result?.data?.email);
-                $('#update_modal').find('#id').val(result?.data?.id);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                Swal.fire(
-                    'Error!',
-                    `${XMLHttpRequest.responseJSON.error}`,
-                    'error'
-                )
-                console.log(XMLHttpRequest, textStatus, errorThrown);
-            }
+    <script>
+        $(function() {
+            $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                // "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
-    }
 
-    function update_user(id) {
-        $('#overlay-wrapper').css('display', 'block');
-        $.ajax({
-            url: "{{ route('update_user') }}",
-            type: 'PUT',
-            data: {
-                _token: "{{ csrf_token() }}",
-                id: id,
-                name: $('#update_modal').find('#name').val(),
-                email: $('#update_modal').find('#email').val(),
-            },
-            success: function(result) {
-                $('#overlay-wrapper').css('display', 'none');
-                Swal.fire(
-                    'Success!',
-                    `${result?.success} `,
-                    'success'
-                )
-                location.reload();
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                Swal.fire(
-                    'Error!',
-                    `${XMLHttpRequest.responseJSON.error}`,
-                    'error'
-                )
-                $('#overlay-wrapper').css('display', 'none');
-                console.log(XMLHttpRequest, textStatus, errorThrown);
-            }
-        })
-    }
+        function deleteConfirm(id, name) {
+            Swal.fire({
+                title: `Are you sure you want to delete ${name}?`,
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('delete_user') }}",
+                        type: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: id
+                        },
+                        success: function(result) {
+                            Swal.fire(
+                                'Deleted!',
+                                `${result?.success}.`,
+                                'success'
+                            )
+                            location.reload();
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                            Swal.fire(
+                                'Error Deleting User !',
+                                `${XMLHttpRequest.responseJSON.error}.`,
+                                'error'
+                            )
+                            console.log(XMLHttpRequest, textStatus, errorThrown);
+                        }
+                    });
+                }
+            })
+        }
 
-    function get_user_password_details(id) {
-        // open modal and send request to get conference data
-        $('#update_password_modal').modal('show');
-        $('#update_password_modal').find('#overlay-wrapper').css('display', 'block');
-        $('#update_password_modal').find('#password_confirmation').val('')
-        $('#update_password_modal').find('#password').val('')
-        $.ajax({
-            url: "{{ route('get_user') }}",
-            type: 'GET',
-            data: {
-                _token: "{{ csrf_token() }}",
-                id: id
-            },
-            success: function(result) {
-                console.log(result);
-                $('#update_password_modal').find('#overlay-wrapper').css('display', 'none');
-                $('#update_password_modal').find('#name').val(result?.data?.name);
-                $('#update_password_modal').find('#email').val(result?.data?.email);
-                $('#update_password_modal').find('#user_id').val(result?.data?.id);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                $('#update_password_modal').find('#overlay-wrapper').css('display', 'none');
-                Swal.fire(
-                    'Error!',
-                    `${XMLHttpRequest.responseJSON.error}`,
-                    'error'
-                )
-                console.log(XMLHttpRequest, textStatus, errorThrown);
-            }
-        });
-    }
+        function get_user(id) {
+            // open modal and send request to get conference data
+            $('#update_modal').modal('show');
+            $('#update_modal').find('#overlay-wrapper').css('display', 'block');
+            $.ajax({
+                url: "{{ route('get_user') }}",
+                type: 'GET',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id
+                },
+                success: function(result) {
+                    console.log(result);
+                    // $('#overlay-wrapper').css('display', 'none');
+                    $('#update_modal').find('#overlay-wrapper').css('display', 'none');
+                    $('#update_modal').find('#name').val(result?.data?.name);
+                    $('#update_modal').find('#email').val(result?.data?.email);
+                    $('#update_modal').find('#id').val(result?.data?.id);
+                    $('#update_modal').find('#type').prepend(
+                        $("<option class='text-capitalize' selected></option>")
+                        .attr("value", result?.data?.type)
+                        .text(result?.data?.type.toUpperCase())
+                    );
 
-    function update_password(id) {
-        $('#update_password_modal').find('#overlay-wrapper').css('display', 'block');
-        $.ajax({
-            url: "{{ route('update_password') }}",
-            type: 'PUT',
-            data: {
-                _token: "{{ csrf_token() }}",
-                id: id,
-                password: $('#update_password_modal').find('#password').val(),
-                password_confirmation: $('#update_password_modal').find('#password_confirmation').val()
-            },
-            success: function(result) {
-                $('#update_password_modal').find('#overlay-wrapper').css('display', 'none');
-                Swal.fire(
-                    'Success!',
-                    `${result?.success}`,
-                    'success'
-                )
-                $('#update_password_modal').modal('hide');
-                // location.reload();
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                Swal.fire(
-                    'Error!',
-                    `${XMLHttpRequest.responseJSON.error? XMLHttpRequest.responseJSON.error:XMLHttpRequest.responseJSON.errors.password[0]} `,
-                    'error'
-                )
-                $('#update_password_modal').find('#overlay-wrapper').css('display', 'none');
-                console.log(XMLHttpRequest, textStatus, errorThrown);
-            }
-        })
-    }
-</script>
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    $('#update_modal').find('#overlay-wrapper').css('display', 'none');
+                    Swal.fire(
+                        'Error!',
+                        `${XMLHttpRequest.responseJSON.error}`,
+                        'error'
+                    )
+                    console.log(XMLHttpRequest, textStatus, errorThrown);
+                }
+            });
+        }
+
+        function update_user(id) {
+            $('#update_modal').find('#overlay-wrapper').css('display', 'block');
+            $.ajax({
+                url: "{{ route('update_user') }}",
+                type: 'PUT',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id,
+                    name: $('#update_modal').find('#name').val(),
+                    email: $('#update_modal').find('#email').val(),
+                    type: $('#update_modal').find('#type').val(),
+                },
+                success: function(result) {
+                    $('#update_modal').find('#overlay-wrapper').css('display', 'none');
+                    Swal.fire(
+                        'Success!',
+                        `${result?.success} `,
+                        'success'
+                    )
+                    location.reload();
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    Swal.fire(
+                        'Error!',
+                        `${XMLHttpRequest.responseJSON.error}`,
+                        'error'
+                    )
+                    $('#update_modal').find('#overlay-wrapper').css('display', 'none');
+                    console.log(XMLHttpRequest, textStatus, errorThrown);
+                }
+            })
+        }
+
+        function get_user_password_details(id) {
+            // open modal and send request to get conference data
+            $('#update_password_modal').modal('show');
+            $('#update_password_modal').find('#overlay-wrapper').css('display', 'block');
+            $('#update_password_modal').find('#password_confirmation').val('')
+            $('#update_password_modal').find('#password').val('')
+            $.ajax({
+                url: "{{ route('get_user') }}",
+                type: 'GET',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id
+                },
+                success: function(result) {
+                    console.log(result);
+                    $('#update_password_modal').find('#overlay-wrapper').css('display', 'none');
+                    $('#update_password_modal').find('#name').val(result?.data?.name);
+                    $('#update_password_modal').find('#email').val(result?.data?.email);
+                    $('#update_password_modal').find('#user_id').val(result?.data?.id);
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    $('#update_password_modal').find('#overlay-wrapper').css('display', 'none');
+                    Swal.fire(
+                        'Error!',
+                        `${XMLHttpRequest.responseJSON.error}`,
+                        'error'
+                    )
+                    console.log(XMLHttpRequest, textStatus, errorThrown);
+                }
+            });
+        }
+
+        function update_password(id) {
+            $('#update_password_modal').find('#overlay-wrapper').css('display', 'block');
+            $.ajax({
+                url: "{{ route('update_password') }}",
+                type: 'PUT',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id,
+                    password: $('#update_password_modal').find('#password').val(),
+                    password_confirmation: $('#update_password_modal').find('#password_confirmation').val()
+                },
+                success: function(result) {
+                    $('#update_password_modal').find('#overlay-wrapper').css('display', 'none');
+                    Swal.fire(
+                        'Success!',
+                        `${result?.success}`,
+                        'success'
+                    )
+                    $('#update_password_modal').modal('hide');
+                    // location.reload();
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    Swal.fire(
+                        'Error!',
+                        `${XMLHttpRequest.responseJSON.error? XMLHttpRequest.responseJSON.error:XMLHttpRequest.responseJSON.errors.password[0]} `,
+                        'error'
+                    )
+                    $('#update_password_modal').find('#overlay-wrapper').css('display', 'none');
+                    console.log(XMLHttpRequest, textStatus, errorThrown);
+                }
+            })
+        }
+    </script>
 @endsection
 @endsection

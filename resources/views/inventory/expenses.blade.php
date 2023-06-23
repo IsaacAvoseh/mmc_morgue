@@ -167,7 +167,7 @@
                 processing: true,
                 serverSide: true,
                 paging: true,
-                ordering: false,
+                ordering: true,
                 pageLength: 50,
                 responsive: true,
                 info: true,

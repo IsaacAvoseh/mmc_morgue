@@ -27,7 +27,7 @@ class InventoryHistoyController extends Controller
 
         // $columnIndex = $columnIndex_arr[0]['column']; // Column index
         // $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
         // Total records
@@ -144,7 +144,7 @@ class InventoryHistoyController extends Controller
 
         // $columnIndex = $columnIndex_arr[0]['column']; // Column index
         // $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
         // Total records

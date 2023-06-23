@@ -117,5 +117,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::delete('delete_user', [AuthController::class, 'delete_user'])->name('delete_user');
     Route::get('get_user', [AuthController::class, 'get_user'])->name('get_user');
     Route::put('update_user', [AuthController::class, 'update_user'])->name('update_user');
+    Route::post('switch_user', [AuthController::class, 'switch_user'])->name('switch_user');
     Route::put('update_password', [AuthController::class, 'update_password'])->name('update_password');
 });

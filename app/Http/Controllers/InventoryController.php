@@ -45,7 +45,7 @@ class InventoryController extends Controller
 
         $columnIndex = $columnIndex_arr[0]['column']; // Column index
         $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         // $columnSortOrder = $order_arr[0]['desc']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
@@ -54,7 +54,7 @@ class InventoryController extends Controller
         $totalRecordswithFilter = Inventory::select('count(*) as allcount')->where('name', 'like', '%' . $searchValue . '%')->count();
 
         // Fetch records
-        $records = Inventory::orderBy($columnName, $columnSortOrder)
+        $records = Inventory::orderByDesc('created_at')
             ->where('name', 'like', '%' . $searchValue . '%')
             ->skip($start)
             ->take($rowperpage)
@@ -189,7 +189,7 @@ class InventoryController extends Controller
 
         $columnIndex = $columnIndex_arr[0]['column']; // Column index
         $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         // $columnSortOrder = $order_arr[0]['desc']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
@@ -198,7 +198,7 @@ class InventoryController extends Controller
         $totalRecordswithFilter = Inventory::select('count(*) as allcount')->where('name', 'like', '%' . $searchValue . '%')->count();
 
         // Fetch records
-        $records = Inventory::orderBy($columnName, $columnSortOrder)
+        $records = Inventory::orderByDesc('created_at')
             ->where('name', 'like', '%' . $searchValue . '%')
             ->skip($start)
             ->take($rowperpage)
@@ -282,7 +282,7 @@ class InventoryController extends Controller
 
         $columnIndex = $columnIndex_arr[0]['column']; // Column index
         $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         // $columnSortOrder = $order_arr[0]['desc']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
@@ -295,7 +295,7 @@ class InventoryController extends Controller
             ->count();
 
         // Fetch records
-        $records = RequestItem::with('inventory')->orderBy($columnName, $columnSortOrder)
+        $records = RequestItem::with('inventory')->orderByDesc('created_at')
             ->whereHas('inventory', function ($query) use ($searchValue) {
                 $query->where('name', 'like', '%' . $searchValue . '%');
             })->where('status', 'request')

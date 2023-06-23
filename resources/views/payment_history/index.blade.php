@@ -72,6 +72,7 @@
                     <!-- /.col -->
 
                     <!-- /.col -->
+                    @if(Auth::user() && session()->get('user_type') == 'admin')
                     <div class="col-md-3 col-sm-6 col-12">
                         <div class="info-box">
                             <span class="info-box-icon bg-warning"><i class="fas fa-money-check-alt"></i></span>
@@ -83,6 +84,7 @@
                         </div>
                         <!-- /.info-box -->
                     </div>
+                    @endif
                     <!-- /.col -->
 
                 </div>

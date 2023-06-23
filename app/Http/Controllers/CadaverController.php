@@ -258,7 +258,7 @@ class CadaverController extends Controller
 
         $columnIndex = $columnIndex_arr[0]['column']; // Column index
         $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         // $columnSortOrder = $order_arr[0]['desc']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
@@ -449,7 +449,7 @@ class CadaverController extends Controller
 
         // $columnIndex = $columnIndex_arr[0]['column']; // Column index
         // $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
         // Check if start and end date are present in the request
@@ -629,7 +629,7 @@ class CadaverController extends Controller
 
         $columnIndex = $columnIndex_arr[0]['column']; // Column index
         $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         // $columnSortOrder = $order_arr[0]['desc']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
@@ -710,6 +710,7 @@ class CadaverController extends Controller
      public function reports(){
         return view('corpses.reports');
     }
+    
     public function get_reports(Request $request)
     {
         // dd($request->all());
@@ -724,7 +725,7 @@ class CadaverController extends Controller
 
         $columnIndex = $columnIndex_arr[0]['column']; // Column index
         $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        // $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         // $columnSortOrder = $order_arr[0]['desc']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 

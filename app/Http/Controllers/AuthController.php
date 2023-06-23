@@ -21,14 +21,16 @@ class AuthController extends Controller
                 'email' => ['required', 'email'],
                 'password' => ['required'],
             ]);
+            
             if (Auth::attempt($credentials)) {
-
+                if (Auth::user()->type == 'none') {
+                    Auth::logout();
+                    return back()->withErrors('Login failed, please contact the admin');
+                }
                 $request->session()->regenerate();
                 session()->put('user',Auth::user());
+                session()->put('user_type',Auth::user()->type);
                 return redirect()->intended('admin/dashboard');
-
-                // $request->session()->regenerate();
-                // return redirect()->intended('/');
             }
 
             return back()->withErrors([
@@ -158,6 +160,9 @@ class AuthController extends Controller
             if (auth()->user()->type != 'admin') {
                 return response()->json(['error' => 'You are not authorized to perform this action.'], 403);
             }
+            if ($request->id == auth()->user()->id && $request->type != 'admin') {
+                return response()->json(['error' => 'Sorry, you cannot change your own type'], 400);
+            }
             try {
                 // dd($request->all());
                 $user = User::find($request->id);
@@ -196,6 +201,18 @@ class AuthController extends Controller
             return response()->json(['error' => 'Something went wrong.'], 500);
         }
     }
+
+
+    public function switch_user(Request $request){
+        // change user_type in session and return json response
+        if($request->user_type){
+            session()->put('user_type',$request->user_type);
+            return response()->json(['message' => 'User Type changed successfully'], 200);
+        }else{
+            return response()->json(['message' => 'Error changing user type'], 500);
+        }
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();

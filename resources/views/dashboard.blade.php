@@ -110,7 +110,7 @@
             <!-- /.col -->
 
             <!-- /.col -->
-            @if (Auth::user() && Auth::user()->type == 'admin')
+            @if (Auth::user() && session()->get('user_type') == 'admin')
             <div class="col-md-3 col-sm-6 col-12">
                 <a style="color: inherit" href="{{ route('payment_history') }}">
                     <div class="info-box">

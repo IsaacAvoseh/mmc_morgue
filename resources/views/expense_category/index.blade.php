@@ -61,11 +61,13 @@
                     <div class="card-header">
                         <div class="row justify-content-between">
                             <p></p>
+                            @if(Auth::user() && session()->get('user_type') == 'admin')
                             <button type="button" class="btn btn-primary" data-toggle="modal"
                                 data-target="#addNewModal">
                                 <i class="fa fa-plus"></i>
                                 Add New
                             </button>
+                            @endif
                         </div>
                         {{-- lodaing spinner --}}
                         <div class="overlay-wrapper" id="overlay-wrapper">
