@@ -13,7 +13,7 @@
             <div class="col-12">
 
                 <!-- /.modal-dialog -->
-                <div class="card">
+                <div class="card" id="print-card">
                     <div class="card-header">
                         <a class="align-self-start btn btn-default" href="{{ url()->previous() }}"> <i
                                 class="fa fa-arrow-left"> </i> Back</a>
@@ -77,12 +77,20 @@
                                 <div class="row w-100">
                                     <p> <b>{{ $file->document->name?? '-' }}</b> <a href="{{  asset('storage/app/'.$file->path) }}" download="{{ $file->document->name}}" >Download</a> </p>
                                 @empty
-                                    <p><b>No file uploaded</b></p>
+                                    <p> <br> <b>No file uploaded</b></p>
                                 </div>
                                 @endforelse
                             </div>
-                            <a class="btn btn-success m-2" href="{{ route('release', ['id' => base64_encode($data->id)]) }}"> <i class="fa fa-sign-out-alt"></i> Release</a>
                              {{-- <a class="btn btn-default" href="{{route('update_payment', ['id' => base64_encode($data->id)]) }}">Click here to pay</a> --}}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                            <a class="btn btn-success m-2" href="{{ route('release', ['id' => base64_encode($data->id)]) }}"> <i class="fa fa-sign-out-alt"></i> Release</a>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-secondary" onclick="printCard()"> <i class="fa fa-print"></i> Print</button>
+                            <a class="btn btn-primary m-2" href="{{ route('edit_corpse', ['id' => base64_encode($data->id)]) }}"> <i class="fa fa-pen"></i> Edit</a>
+                            </div>
                         </div>
                         </div>
                     </div>
@@ -191,6 +199,21 @@
             // $('#admission_form2').attr('hidden', false);
 
     });
+
+
+  function printCard() {
+    var card = $('#print-card');
+    var originalDisplay = card.css('display');
+
+    // Temporarily show the card for printing
+    card.css('display', 'block');
+
+    // Print the card section
+    window.print();
+
+    // Restore the original display style
+    card.css('display', originalDisplay);
+  }
 </script>
 @endsection
 @endsection

@@ -318,6 +318,7 @@ class CadaverController extends Controller
 
     public function get_corpse(Request $request)
     {
+        // dd($request->all());
         if ($request->id) {
             $corpse = Corpse::find(base64_decode($request->id));
             $files = FileUpload::where('corpse_id', base64_decode($request->id))->with('document')->get();
@@ -325,6 +326,26 @@ class CadaverController extends Controller
             return view('corpses.view', ['data' => $corpse, 'files' => $files]);
         } else {
             return back()->withErrors('Something went wrong!');
+        }
+    }
+
+    public function edit_corpse(Request $request)
+    {
+        if ($request->id) {
+            $corpse = Corpse::find(base64_decode($request->id));
+            if($request->isMethod('POST')){
+                $corpse = Corpse::find($request->id);
+                try{
+                    $data = $request->except(['_token', 'id']);
+                    $corpse->update($data);
+                    return redirect()->route('get_corpse', ['id' => base64_encode($corpse->id)])->with('success', 'Corpse updated successfully');
+                }catch(\Exception $e){
+                    return back()->withErrors('Something went wrong..!');
+                }
+            }
+            return view('corpses.edit', ['data' => $corpse]);
+        } else {
+            return back()->withErrors('Something went wrong..!');
         }
     }
 

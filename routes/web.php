@@ -45,6 +45,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::match(['GET', 'POST'], '/corpses', [CadaverController::class, 'index'])->name('corpses');
     Route::get('/get_corpses', [CadaverController::class, 'get_corpses'])->name('get_corpses');
     Route::get('/get_corpse', [CadaverController::class, 'get_corpse'])->name('get_corpse');
+    Route::match(['GET', 'POST'], '/edit_corpse', [CadaverController::class, 'edit_corpse'])->name('edit_corpse');
     Route::get('/get_num_of_days', [CadaverController::class, 'get_num_of_days'])->name('get_num_of_days');
     Route::get('/add_days', [CadaverController::class, 'add_days'])->name('add_days');
     Route::post('/update_admission', [CadaverController::class, 'update_admission'])->name('update_admission');
