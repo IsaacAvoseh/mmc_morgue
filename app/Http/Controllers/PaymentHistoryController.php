@@ -6,6 +6,7 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PaymentHistoryController extends Controller
 {
@@ -83,7 +84,7 @@ class PaymentHistoryController extends Controller
             $date = $record->created_at->format('Y-m-d');
             $payment_method = ucfirst($record->mode);
             $amount = $record->price * $record->qty;
-            $service = $record->service->name;
+            $service = $record->service-> name ?? Str::limit($record->corpse->desc, 18, '...') ?? 'Affixed Bill';
 
             $data_arr[] = array(
                 "id" => ($start / $rowperpage) * $rowperpage + $key + 1,

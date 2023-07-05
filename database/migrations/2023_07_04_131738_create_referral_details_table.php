@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePaymentsTable extends Migration
+class CreateReferralDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreatePaymentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('referral_details', function (Blueprint $table) {
             $table->id();
-            $table->string('qty');
-            $table->string('status')->nullable();
-            $table->foreignId('service_id')->nullable()->constrained();
+            $table->foreignId('referral_id')->constrained();
             $table->foreignId('corpse_id')->constrained();
+            $table->string('status')->nullable();
             $table->foreignId('user_id')->constrained();
+            $table->decimal('amount', 14, 2)->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ class CreatePaymentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('referral_details');
     }
 }

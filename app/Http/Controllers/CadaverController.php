@@ -7,6 +7,8 @@ use App\Models\Document;
 use App\Models\FileUpload;
 use App\Models\Payment;
 use App\Models\Rack;
+use App\Models\Referral;
+use App\Models\ReferralDetails;
 use App\Models\Release;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -48,6 +50,7 @@ class CadaverController extends Controller
                 } else {
                     $admit = new Corpse();
                     $saved = $admit->create($data);
+                    session()->flash('ref_corpse_id', $saved->id);
                 }
 
                 return response()->json(['success' => 'Added Successfully', 'data' => $saved], 200);
@@ -185,6 +188,8 @@ class CadaverController extends Controller
                     'date_from' => $request->date_from,
                     'date_to' => $request->date_to,
                     'amount' => $corpse->amount + $request->total_amount,
+                    'discount' => $corpse->discount + $request->discount,
+                    'amount_paid' => $corpse->amount_paid + $request->amount_paid,
                     'no_of_days' => $corpse->no_of_days + $request->no_of_days,
                     'paid' => 'yes'
                 ]);
@@ -322,8 +327,9 @@ class CadaverController extends Controller
         if ($request->id) {
             $corpse = Corpse::find(base64_decode($request->id));
             $files = FileUpload::where('corpse_id', base64_decode($request->id))->with('document')->get();
-            // dd($files);
-            return view('corpses.view', ['data' => $corpse, 'files' => $files]);
+            $referral = ReferralDetails::with(['referral'])->where('corpse_id', base64_decode($request->id))->first();
+            // dd($corpse);
+            return view('corpses.view', ['data' => $corpse, 'files' => $files, 'referral' => $referral]);
         } else {
             return back()->withErrors('Something went wrong!');
         }
@@ -384,7 +390,7 @@ class CadaverController extends Controller
             $embalmment_fee = Service::where('name', 'Embalmment')->pluck('price')[0];
             $daily_fee = Service::where('name', 'Daily Fee')->pluck('price')[0];
             $date_to = Carbon::parse($corpse->date_to);
-
+            // dd($daily_fee);
             $days_diff = $date_to->diffInDays(now());
             // dd($days_diff);
             if($days_diff > 0 & $date_to < now()){
@@ -393,9 +399,10 @@ class CadaverController extends Controller
             }
 
             // dd($corpse->date_to, $days_diff, $due_today);
-
-            $release = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 & $file_message == 'no' & $due_today == 0 ? 'yes' : 'no';
-            $release1 = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0  & $due_today == 0 ? 'yes' : 'no';
+            // $payment = $payment;
+            $corpse_amount = $corpse->amount_paid + $corpse->discount + $corpse->affixed_bill;
+            $release = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0 & $file_message == 'no' & $due_today == 0 ? 'yes' : 'no';
+            $release1 = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0  & $due_today == 0 ? 'yes' : 'no';
             // dd($release1);
             return view(
                 'corpses.release',
@@ -611,8 +618,11 @@ class CadaverController extends Controller
                 // All required files have been uploaded
             }
 
-            $release = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 & $file_message == 'no' ? 'yes' : 'no';
-            $release1 = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 ? 'yes' : 'no';
+            // $release = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 & $file_message == 'no' ? 'yes' : 'no';
+            // $release1 = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 ? 'yes' : 'no';
+            $corpse_amount = $corpse->amount_paid + $corpse->discount + $corpse->affixed_bill;
+            $release = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0 & $file_message == 'no' ? 'yes' : 'no';
+            $release1 = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0  ? 'yes' : 'no';
 
             // dd($release);
             $files = Document::latest()->get();

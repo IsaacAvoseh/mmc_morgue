@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AffixBillController;
 use App\Http\Controllers\CadaverController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ExpenseCategoryController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryHistoyController;
 use App\Http\Controllers\PaymentHistoryController;
 use App\Http\Controllers\RackController;
+use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -112,6 +114,19 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::match(['GET', 'POST'],'/inventory/expenses', [InventoryHistoyController::class, 'expenses'])->name('expenses');
     Route::match(['GET', 'POST'],'/inventory/expense_category', [ExpenseCategoryController::class, 'expense_category'])->name('expense_category');
     Route::get('/inventory/get_expense_category', [ExpenseCategoryController::class, 'get_expense_category'])->name('get_expense_category');
+
+    // Referrals
+    Route::match(['GET', 'POST'], '/referrals', [ReferralController::class, 'referrals'])->name('referrals');
+    Route::get('/get_referrals', [ReferralController::class, 'get_referrals'])->name('get_referrals');
+    Route::get('/get_referral', [ReferralController::class, 'get_referral'])->name('get_referral');
+    Route::get('/referral', [ReferralController::class, 'referral'])->name('referral');
+    Route::post('/add_ref_details', [ReferralController::class, 'add_ref_details'])->name('add_ref_details');
+    Route::get('/get_referral_details', [ReferralController::class, 'get_referral_details'])->name('get_referral_details');
+    Route::put('/referral_edit', [ReferralController::class, 'referral_edit'])->name('referral_edit');
+
+    // Affix bill
+    Route::post('/affix_bill', [AffixBillController::class, 'affix_bill'])->name('affix_bill');
+
 
     // users
     Route::match(['GET', 'POST'], 'users', [AuthController::class, 'users'])->name('users');

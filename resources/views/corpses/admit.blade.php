@@ -46,7 +46,8 @@
                                             <label>Name of Deceased:</label>
                                             <div class="input-group date" id="reservationdate"
                                                 data-target-input="nearest">
-                                                <input type="text" name="name" id="name" value="{{ old('name') }}"
+                                                <input type="text" name="name" id="name"
+                                                    value="{{ old('name') }}"
                                                     class="form-control datetimepicker-input"
                                                     placeholder="Name of Deceased" required>
                                                 {{-- <p class="error-message text-danger"></p> --}}
@@ -157,8 +158,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
-
                                     </div>
                                     {{-- family rep 1 --}}
                                     <div class="col-md-6 mt-2">
@@ -277,6 +276,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Select Rack:</label><br>
@@ -360,13 +360,18 @@
                                 </div>
                             </div>
                             {{-- end loading spinner --}}
+                            {{-- @include('shared.referral',['ref_corpse_id' => $('admi') ]) --}}
+                            @include('shared.referral', [
+                                'ref_corpse_id' => session()->get('ref_corpse_id'),
+                            ])
                             <form method="POST" action="{{ route('with_payment') }}" enctype="multipart/form-data"
                                 id="form3">
                                 @csrf
-                                <input type="hidden" name="admission_id" id="admission_id3">
+                                <input type="hidden" name="admission_id" id="admission_id3" value="9">
                                 <p class="text-danger"></p>
                                 <a onclick="showFileForm()" class="btn btn-default mb-2"> <i
                                         class="fas fa-arrow-left"></i> Back</a>
+
                                 <div class="row">
                                     <div class="col-md-6" id="rcp">
                                         <table class="table">
@@ -416,7 +421,8 @@
                                                     <td><strong>Total:</strong></td>
                                                     <td><strong>N<span
                                                                 id="total-amount">{{ $totalAmount }}</span></strong>
-                                                        <span> <button type="button" class="btn btn-secondary btn-sm"
+                                                        <span> <button type="button" title="Reset Form"
+                                                                class="btn btn-secondary btn-sm"
                                                                 onclick="resetForm()"> <i
                                                                     class="fas fa-undo"></i></button> </span>
                                                     </td>
@@ -466,17 +472,56 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Total Amount:</label>
-                                            <div class="input-group date" id="reservationdate"
-                                                data-target-input="nearest">
-                                                <input type="text" name="total_amount" id="total_amount" readonly
-                                                    class="form-control datetimepicker-input"
-                                                    placeholder="Total Amount" data-target="#reservationdate"
-                                                    required />
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    <label>Discount:</label>
+                                                    <div class="input-group date" id="reservationdate"
+                                                        data-target-input="nearest">
+                                                        <input type="number" min="0" name="discount"
+                                                            id="discount" class="form-control datetimepicker-input"
+                                                            placeholder="e.g 600" data-target="#reservationdate" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    <label>Affix<span id="affix"></span>:</label>
+                                                    @include('shared.affix_bill', [
+                                                        'affix_corpse_id' => session()->get('ref_corpse_id'),
+                                                    ])
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    <label>Amount:</label>
+                                                    <div class="input-group date" id="reservationdate"
+                                                        data-target-input="nearest">
+                                                        <input type="text" name="total_amount" id="total_amount"
+                                                            readonly class="form-control datetimepicker-input"
+                                                            placeholder="Total Amount" data-target="#reservationdate"
+                                                            required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    <label>Paying:</label>
+                                                    <div class="input-group date" id="reservationdate"
+                                                        data-target-input="nearest">
+                                                        <input type="text" name="amount_paid" id="amount_paid"
+                                                            min="0" class="form-control datetimepicker-input"
+                                                            placeholder="Total Amount" data-target="#reservationdate"
+                                                            required />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Select Payment Mode:</label><br>
@@ -498,19 +543,15 @@
                                             <a href="{{ route('without_payment') }}"
                                                 class="btn btn-secondary">Continue without
                                                 Payment</a>
-                                            <button type="button" onclick="submitWithPayment()" class="btn btn-primary w-25">Pay Now & Continue </button>
+                                            <button type="button" onclick="submitWithPayment()"
+                                                class="btn btn-primary w-25">Pay Now & Continue </button>
                                         </div>
                                     </div>
                                 </div>
                             </form>
-                        
+
                         </div>
-                        <style>
-                            .my-toast-class {
-                                font-size: 14px;
-                                padding: 10px 20px;
-                            }
-                        </style>
+
                     </div>
                     <!-- /.card-body -->
                 </div>
@@ -526,305 +567,305 @@
 
 @section('scripts')
     @parent
-<script>
-     var Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2000
-    });
-    // $(window).on('beforeunload', function() {
-    //     return 'Are you sure you want to leave?';
-    // });
-    $(document).on('change', 'input[type="file"]', function() {
-        var input = $(this);
-        var fileName = input.val().split('\\').pop();
-        var hiddenInput = input.closest('.form-group').find('input[type="hidden"]');
-        if (fileName) {
-            hiddenInput.attr('name', 'document_id[]');
-        } else {
-            hiddenInput.removeAttr('name');
-        }
-    });
-    document.addEventListener("DOMContentLoaded", function(event) {
-        $('.fee-checkbox').prop('checked', true);
-        document.getElementById('date_from').valueAsDate = new Date();
-    });
-
-    function loading() {
-        $('.card').find('#overlay-wrapper').css('display', 'block');
-    }
-
-    // show main forrm
-    function showPrev() {
-        $('#admission_form').attr('hidden', false);
-        $('#admission_form2').attr('hidden', true);
-    }
-
-    // Show with_payment form
-    function showPaymentForm() {
-        $('#admission_form').attr('hidden', true);
-        $('#admission_form2').attr('hidden', true);
-        $('#admission_form3').attr('hidden', false);
-    }
-
-    // Show files form
-    function showFileForm() {
-        $('#admission_form').attr('hidden', true);
-        $('#admission_form2').attr('hidden', false);
-        $('#admission_form3').attr('hidden', true);
-    }
-
-
-    // submit form
-    function submitForm() {
-        // $("#submit_button").click(function(){
-        var allFilled = true;
-        $('#admission_form input[required]').each(function() {
-            if ($(this).val() == '' || $(this).val() == null) {
-                allFilled = false;
-                // return false;
-                $(this).css('border-color', 'red');
-                $(this).next('.error-message').text('This field is required.');
+    <script>
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+        // $(window).on('beforeunload', function() {
+        //     return 'Are you sure you want to leave?';
+        // });
+        $(document).on('change', 'input[type="file"]', function() {
+            var input = $(this);
+            var fileName = input.val().split('\\').pop();
+            var hiddenInput = input.closest('.form-group').find('input[type="hidden"]');
+            if (fileName) {
+                hiddenInput.attr('name', 'document_id[]');
+            } else {
+                hiddenInput.removeAttr('name');
             }
         });
-        if (allFilled) {
-            // All required fields are filled
-            console.log('fofof111')
-            $('.card').find('#overlay-wrapper1').css('display', 'block');
-            // $("#admission_form").find('form').submit();
-            event.preventDefault();
-            var formData = new FormData($('#form')[0]);
-            console.log('fofof')
-            $.ajax({
-                url: "{{ route('admit') }}",
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    console.log(response);
-                    $('.card').find('#overlay-wrapper1').css('display', 'none');
-                    Swal.fire({
-                        title: `Successfull !!`,
-                        text: `${response.success?? 'Data Saved Successfully!'}`,
-                        icon: 'success',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'OK!'
-                    });
-                    $('#admission_form').attr('hidden', true);
-                    $('#admission_form2').attr('hidden', false);
-                    $('#admission_form').find('#admission_id').val(response?.data.id);
-                    $('#admission_form2').find('#admission_id2').val(response?.data.id);
-                    $('#admission_form3').find('#admission_id3').val(response?.data.id);
+        document.addEventListener("DOMContentLoaded", function(event) {
+            $('.fee-checkbox').prop('checked', true);
+            document.getElementById('date_from').valueAsDate = new Date();
+        });
 
-                },
-               error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(XMLHttpRequest);
-                    if (XMLHttpRequest.responseJSON.error) {
-                        Swal.fire(
-                            'Error !',
-                            `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
-                            'error'
-                        )
-                    } else {
-                        $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: value[0],
-                            });
-                        });
-                    }
-                    $('.card').find('#overlay-wrapper1').css('display', 'none');
+        function loading() {
+            $('.card').find('#overlay-wrapper').css('display', 'block');
+        }
 
+        // show main forrm
+        function showPrev() {
+            $('#admission_form').attr('hidden', false);
+            $('#admission_form2').attr('hidden', true);
+        }
+
+        // Show with_payment form
+        function showPaymentForm() {
+            $('#admission_form').attr('hidden', true);
+            $('#admission_form2').attr('hidden', true);
+            $('#admission_form3').attr('hidden', false);
+        }
+
+        // Show files form
+        function showFileForm() {
+            $('#admission_form').attr('hidden', true);
+            $('#admission_form2').attr('hidden', false);
+            $('#admission_form3').attr('hidden', true);
+        }
+
+
+        // submit form
+        function submitForm() {
+            // $("#submit_button").click(function(){
+            var allFilled = true;
+            $('#admission_form input[required]').each(function() {
+                if ($(this).val() == '' || $(this).val() == null) {
+                    allFilled = false;
+                    // return false;
+                    $(this).css('border-color', 'red');
+                    $(this).next('.error-message').text('This field is required.');
                 }
             });
-            return true;
-        } else {
-            // Some required fields are not filled
-            Swal.fire({
-                title: `Please fill all required input`,
-                text: "Input with red outline are required!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Back!'
-            });
-            return false;
-        }
-
-    }
-
-    // submit file form 
-    function submitFileForm() {
-        // $("#submit_button").click(function(){
-        var allFilled = true;
-        $('#admission_form2 input[required]').each(function() {
-            console.log($(this).val())
-            if ($(this).val() == '' || $(this).val() == null) {
-                allFilled = false;
-                // return false;
-                $(this).css('border-color', 'red');
-                $(this).next('.error-message').text('This field is required.');
-            }
-        });
-        if (allFilled) {
-            // All required fields are filled
-            $('.card').find('#overlay-wrapper2').css('display', 'block');
-            event.preventDefault();
-            var formData = new FormData($('#form2')[0]);
-            console.log('fofof', formData)
-            $.ajax({
-                url: "{{ route('update_admission') }}",
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    console.log(response);
-                    $('.card').find('#overlay-wrapper2').css('display', 'none');
-                    Swal.fire({
-                        title: `Successfull !!`,
-                        text: `${response.success?? 'Files Saved Successfully!'}`,
-                        icon: 'success',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'OK!'
-                    });
-                    $('#admission_form').attr('hidden', true);
-                    $('#admission_form2').attr('hidden', true);
-                    $('#admission_form3').attr('hidden', false);
-                    // $('#admission_form').find('#admission_id').val(response?.data.id);
-                    // $('#admission_form2').find('#admission_id2').val(response?.data.id);
-                },
-               error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(XMLHttpRequest);
-                    if (XMLHttpRequest.responseJSON.error) {
-                        Swal.fire(
-                            'Error !',
-                            `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
-                            'error'
-                        )
-                    } else {
-                        $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: value[0],
-                            });
+            if (allFilled) {
+                // All required fields are filled
+                console.log('fofof111')
+                $('.card').find('#overlay-wrapper1').css('display', 'block');
+                // $("#admission_form").find('form').submit();
+                event.preventDefault();
+                var formData = new FormData($('#form')[0]);
+                console.log('fofof')
+                $.ajax({
+                    url: "{{ route('admit') }}",
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log(response);
+                        $('.card').find('#overlay-wrapper1').css('display', 'none');
+                        Swal.fire({
+                            title: `Successfull !!`,
+                            text: `${response.success?? 'Data Saved Successfully!'}`,
+                            icon: 'success',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'OK!'
                         });
-                    }
-                    $('.card').find('#overlay-wrapper2').css('display', 'none');
+                        $('#admission_form').attr('hidden', true);
+                        $('#admission_form2').attr('hidden', false);
+                        $('#admission_form').find('#admission_id').val(response?.data.id);
+                        $('#admission_form2').find('#admission_id2').val(response?.data.id);
+                        $('#admission_form3').find('#admission_id3').val(response?.data.id);
 
-                }
-            });
-            return true;
-        } else {
-            // Some required fields are not filled
-            Swal.fire({
-                title: `Please upload all required files`,
-                text: "Input with red outline are required!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Back!'
-            });
-            return false;
-        }
-
-    }
-
-    // submit with with_payment
-    // submit form
-    function submitWithPayment() {
-        // $("#submit_button").click(function(){
-        var allFilled = true;
-        $('#admission_form3 input[required]').each(function() {
-            if ($(this).val() == '') {
-                allFilled = false;
-                // return false;
-                $(this).css('border-color', 'red');
-                $(this).next('.error-message').text('This field is required.');
-            }
-        });
-        if (allFilled) {
-            // Get the receipt contents
-            const receipt = document.getElementById('rcp').innerHTML;
-            // All required fields are filled
-            $('.card').find('#overlay-wrapper3').css('display', 'block');
-            // $("#admission_form3").find('#form3').submit();
-            event.preventDefault();
-            var formData = new FormData($('#form3')[0]);
-            console.log('form', formData)
-            $.ajax({
-                url: "{{ route('with_payment') }}",
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    console.log('Payment',response);
-                    $('.card').find('#overlay-wrapper1').css('display', 'none');
-                    Swal.fire({
-                        title: `Successfull !!`,
-                        text: `${response.success?? 'Saved Successfully!'}`,
-                        icon: 'success',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'OK!'
-                    }).then((result) => {
-                        generateReceipt();
-                        if (result.isConfirmed) {
-                            window.location.href = "{{ route('corpses') }}"
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(XMLHttpRequest);
+                        if (XMLHttpRequest.responseJSON.error) {
+                            Swal.fire(
+                                'Error !',
+                                `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
+                                'error'
+                            )
+                        } else {
+                            $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: value[0],
+                                });
+                            });
                         }
-                    })
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(XMLHttpRequest);
-                    if (XMLHttpRequest.responseJSON.error) {
-                        Swal.fire(
-                            'Error !',
-                            `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
-                            'error'
-                        )
-                    } else {
-                        $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: value[0],
-                            });
-                        });
-                    }
-                    $('.card').find('#overlay-wrapper3').css('display', 'none');
+                        $('.card').find('#overlay-wrapper1').css('display', 'none');
 
-                }
-            });
-            return true;
-        } else {
-            // Some required fields are not filled
-            Swal.fire({
-                title: `Please fill all required input`,
-                text: "Input with red outline are required!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Back!'
-            });
-            return false;
+                    }
+                });
+                return true;
+            } else {
+                // Some required fields are not filled
+                Swal.fire({
+                    title: `Please fill all required input`,
+                    text: "Input with red outline are required!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Back!'
+                });
+                return false;
+            }
+
         }
 
-    }
+        // submit file form 
+        function submitFileForm() {
+            // $("#submit_button").click(function(){
+            var allFilled = true;
+            $('#admission_form2 input[required]').each(function() {
+                console.log($(this).val())
+                if ($(this).val() == '' || $(this).val() == null) {
+                    allFilled = false;
+                    // return false;
+                    $(this).css('border-color', 'red');
+                    $(this).next('.error-message').text('This field is required.');
+                }
+            });
+            if (allFilled) {
+                // All required fields are filled
+                $('.card').find('#overlay-wrapper2').css('display', 'block');
+                event.preventDefault();
+                var formData = new FormData($('#form2')[0]);
+                console.log('fofof', formData)
+                $.ajax({
+                    url: "{{ route('update_admission') }}",
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log(response);
+                        $('.card').find('#overlay-wrapper2').css('display', 'none');
+                        Swal.fire({
+                            title: `Successfull !!`,
+                            text: `${response.success?? 'Files Saved Successfully!'}`,
+                            icon: 'success',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'OK!'
+                        });
+                        $('#admission_form').attr('hidden', true);
+                        $('#admission_form2').attr('hidden', true);
+                        $('#admission_form3').attr('hidden', false);
+                        // $('#admission_form').find('#admission_id').val(response?.data.id);
+                        // $('#admission_form2').find('#admission_id2').val(response?.data.id);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(XMLHttpRequest);
+                        if (XMLHttpRequest.responseJSON.error) {
+                            Swal.fire(
+                                'Error !',
+                                `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
+                                'error'
+                            )
+                        } else {
+                            $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: value[0],
+                                });
+                            });
+                        }
+                        $('.card').find('#overlay-wrapper2').css('display', 'none');
 
-    $(function() {
+                    }
+                });
+                return true;
+            } else {
+                // Some required fields are not filled
+                Swal.fire({
+                    title: `Please upload all required files`,
+                    text: "Input with red outline are required!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Back!'
+                });
+                return false;
+            }
+
+        }
+
+        // submit with with_payment
+        // submit form
+        function submitWithPayment() {
+            // $("#submit_button").click(function(){
+            var allFilled = true;
+            $('#admission_form3 input[required]').each(function() {
+                if ($(this).val() == '') {
+                    allFilled = false;
+                    // return false;
+                    $(this).css('border-color', 'red');
+                    $(this).next('.error-message').text('This field is required.');
+                }
+            });
+            if (allFilled) {
+                // Get the receipt contents
+                const receipt = document.getElementById('rcp').innerHTML;
+                // All required fields are filled
+                $('.card').find('#overlay-wrapper3').css('display', 'block');
+                // $("#admission_form3").find('#form3').submit();
+                event.preventDefault();
+                var formData = new FormData($('#form3')[0]);
+                console.log('form', formData)
+                $.ajax({
+                    url: "{{ route('with_payment') }}",
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log('Payment', response);
+                        $('.card').find('#overlay-wrapper1').css('display', 'none');
+                        Swal.fire({
+                            title: `Successfull !!`,
+                            text: `${response.success?? 'Saved Successfully!'}`,
+                            icon: 'success',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'OK!'
+                        }).then((result) => {
+                            generateReceipt();
+                            if (result.isConfirmed) {
+                                window.location.href = "{{ route('corpses') }}"
+                            }
+                        })
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(XMLHttpRequest);
+                        if (XMLHttpRequest.responseJSON.error) {
+                            Swal.fire(
+                                'Error !',
+                                `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
+                                'error'
+                            )
+                        } else {
+                            $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: value[0],
+                                });
+                            });
+                        }
+                        $('.card').find('#overlay-wrapper3').css('display', 'none');
+
+                    }
+                });
+                return true;
+            } else {
+                // Some required fields are not filled
+                Swal.fire({
+                    title: `Please fill all required input`,
+                    text: "Input with red outline are required!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Back!'
+                });
+                return false;
+            }
+
+        }
+
+        $(function() {
             $('.card').find('#overlay-wrapper').css('display', 'none');
             $('.card').find('#overlay-wrapper1').css('display', 'none');
             $('.card').find('#overlay-wrapper2').css('display', 'none');
             $('.card').find('#overlay-wrapper3').css('display', 'none');
             $('#admission_form').attr('hidden', false);
-            // $('#admission_form2').attr('hidden', false);
+            // $('#admission_form3').attr('hidden', false);
 
             // fee cal
             updateTotalAmount();
@@ -903,7 +944,7 @@
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
 
-                    console.log(XMLHttpRequest);
+                        console.log(XMLHttpRequest);
                     }
                 });
 
@@ -943,7 +984,26 @@
 
                 $('#total-amount').text(totalAmount.toLocaleString());
                 $('#total_amount').val(totalAmount);
+                $('#amount_paid').val(totalAmount);
             }
+
+            // onkeyup of #discount
+            $('#discount').keyup(function(event) {
+                // Handle keyup event here
+                var totalAmount = parseFloat($('#total_amount').val());
+                var discount = parseFloat($(this).val());
+                var amountPaid = totalAmount - discount;
+
+                if (discount) {
+                    if (amountPaid >= 0) {
+                        $('#amount_paid').val(amountPaid);
+                    } else {
+                        $('#amount_paid').val(0);
+                    }
+                } else {
+                    $('#amount_paid').val(totalAmount);
+                }
+            });
 
         });
 
@@ -973,10 +1033,10 @@
                         $('#daily').val(result.days);
                     }
                     $('.card').find('#overlay-wrapper3').css('display', 'none');
-                     Toast.fire({
-                    icon: 'success',
-                    title: 'Number of days updated Successfully !'
-                  })
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Number of days updated Successfully !'
+                    })
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
                     Swal.fire({
@@ -1006,107 +1066,136 @@
         });
 
 
-    function resetForm() {
-        // Reset all unit fees to 0
-        $('.unit-fee').val(0);
+        function resetForm() {
+            // Reset all unit fees to 0
+            $('.unit-fee').val(0);
 
-        // Uncheck all fee checkboxes
-        // $('.fee-checkbox').prop('checked', false);
+            // Uncheck all fee checkboxes
+            // $('.fee-checkbox').prop('checked', false);
 
-        // Reset number of days to 1
-        $('#no-of-days').val(0);
+            // Reset number of days to 1
+            $('#no-of-days').val(0);
 
-        // Reset total amount
-        $('#total-amount').text('5000');
-        $('#total_amount').val('5000');
-    }
+            // Reset total amount
+            $('#total-amount').text('5000');
+            $('#total_amount').val('5000');
+            $('#amount_paid').val('5000');
+        }
 
-    function generateReceipt() {
-        // Get all selected fees
-        var fees = document.querySelectorAll('input[name="fee[]"]:checked');
-        var name =  $('#name').val();
-        var mode =  $('#mode').val().toUpperCase();
+        function generateReceipt() {
+            // Get all selected fees
+            var fees = document.querySelectorAll('input[name="fee[]"]:checked');
+            var name = $('#name').val();
+            var mode = $('#mode').val().toUpperCase();
+            // var discount = $('#discount').val();
+            // let bill = $('#affix_amount').val();
+            var discount = parseFloat($('#discount').val());
+            let bill = parseFloat($('#affix_amount').val());
+            var affix_desc = $('#desc').val();
+            var limitedDesc = affix_desc?.substring(0, 18);
+            if (affix_desc?.length > 15) {
+            limitedDesc +="...";
+            }
 
-        // receipt no
-         // Generate a random 6-digit number
-        const randomNumber = Math.floor(Math.random() * 900000) + 100000;
-        // Get the current timestamp in milliseconds
-        const timestamp = Date.now();
-        // Combine the random number and timestamp to create the receipt number
-        const receiptNumber = `#REC-${randomNumber}-${timestamp}`;
-        const today = new Date();
-const day = today.getDate();
-const month = today.getMonth() + 1; // Months are zero-indexed, so January is 0
-const year = today.getFullYear();
-const hours = today.getHours();
-const minutes = today.getMinutes();
-const seconds = today.getSeconds();
+            // receipt no
+            // Generate a random 6-digit number
+            const randomNumber = Math.floor(Math.random() * 900000) + 100000;
+            // Get the current timestamp in milliseconds
+            const timestamp = Date.now();
+            // Combine the random number and timestamp to create the receipt number
+            const receiptNumber = `#REC-${randomNumber}-${timestamp}`;
+            const today = new Date();
+            const day = today.getDate();
+            const month = today.getMonth() + 1; // Months are zero-indexed, so January is 0
+            const year = today.getFullYear();
+            const hours = today.getHours();
+            const minutes = today.getMinutes();
+            const seconds = today.getSeconds();
 
-const formattedDate = `${day}/${month}/${year}`;
-const formattedTime = `${hours}:${minutes}:${seconds}`;
-        // Create a table to display the receipt
-        var table = '<table>' +
-            '<thead>' +
-            `<tr> MMC MORTUARY AND FUNERAL HOME </tr> <br>` +
-            `<tr><small>30/32 ADENLE STREET, OFF ALFA NLA ROAD, OKE-KOTO, AGEGE, LAGOS</small>  </tr><br>` +
-            `<tr> ${`${formattedDate}, ${formattedTime}`} </tr> <br>` +
-            `<tr> ${receiptNumber} </tr> <br>` +
-            '<tr>' +
-            '<hr>' +
-            '<th>Fee</th>' +
-            '<th>Amount</th>' +
-            '<th>Units</th>' +
-            '<th>Subtotal</th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody>';
+            const formattedDate = `${day}/${month}/${year}`;
+            const formattedTime = `${hours}:${minutes}:${seconds}`;
+            // Create a table to display the receipt
+            var table = '<table>' +
+                '<thead>' +
+                `<tr> MMC MORTUARY AND FUNERAL HOME </tr> <br>` +
+                `<tr><small>30/32 ADENLE STREET, OFF ALFA NLA ROAD, OKE-KOTO, AGEGE, LAGOS</small>  </tr><br>` +
+                `<tr> ${`${formattedDate}, ${formattedTime}`} </tr> <br>` +
+                `<tr> ${receiptNumber} </tr> <br>` +
+                '<hr>' +
+                '<tr>' +
+                '<th>Fee</th>' +
+                '<th>Units</th>' +
+                '<th>Amount</th>' +
+                '<th>Subtotal</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
 
-        // Loop through each selected fee and calculate subtotal
-        var totalAmount = 0;
-        fees.forEach(function(fee) {
-            var amount = parseFloat(fee.dataset.amount);
-            var units = parseInt(fee.parentNode.parentNode.parentNode.querySelector('.unit-fee').value);
-            var subtotal = amount * units;
-            totalAmount += subtotal;
+            // Loop through each selected fee and calculate subtotal
+            var totalAmount = 0;
+            fees.forEach(function(fee) {
+                var amount = parseFloat(fee.dataset.amount);
+                var units = parseInt(fee.parentNode.parentNode.parentNode.querySelector('.unit-fee').value);
+                var subtotal = amount * units;
+                totalAmount += subtotal;
 
-            // Add fee details to the table
-            table += '<tr>' +
-                '<td>' + fee.parentNode.parentNode.parentNode.querySelector('td:first-child').textContent +
-                '</td>' +
-                '<td>' + amount.toFixed(2) + '</td>' +
-                '<td>' + units + '</td>' +
-                '<td>' + subtotal.toFixed(2) + '</td>' +
-                '</tr>';
-        });
+                // Add fee details to the table
+                table += '<tr>' +
+                    '<td>' + fee.parentNode.parentNode.parentNode.querySelector('td:first-child').textContent +
+                    '</td>' +
+                    '<td>' + units + '</td>' +
+                    '<td>' + amount.toFixed(2) + '</td>' +
+                    '<td>' + subtotal.toFixed(2) + '</td>' +
+                    '</tr>';
+            });
 
-        // Add total amount to the table
-        table += '<tr>' +
-            '<td colspan="3"><strong>Total:</strong></td>' +
-            '<td><strong>' + totalAmount.toFixed(2) + '</strong></td>' +
-            '</tr>' +
-            '<tr>' +
-            '<td colspan="2"><strong>Deceased Name:</strong></td>' +
-            '<td><strong>' + name + '</strong></td>' +
-            '</tr>'+
-            '<tr>' +
-            '<td colspan="2"><strong>Payment Mode:</strong></td>' +
-            '<td><strong>' + mode + '</strong></td>' +
-            '</tr>'+
-            '</tbody>' +
-            '</table>';
+          
+              // Calculate the total amount including affixed bill
+                totalAmount += isNaN(bill) ? 0 : bill;
+
+                // Calculate the total amount after applying discount
+                let total = totalAmount - (isNaN(discount) ? 0 : discount);
+              table +=
+                (bill ? '<tr>' +
+                    '<td>Affixed:</td>' +
+                    '<td colspan="2">' + limitedDesc + '</td>' +
+                    '<td>' + bill + '</td>' +
+                    '</tr>' : '') +
+                '<hr>' +
+                '<tr>' +
+                '<td colspan="3"><strong>Total:</strong></td>' +
+                '<td><strong>' + (isNaN(totalAmount) ? totalAmount : totalAmount.toFixed(2)) + '</strong></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td colspan="3"><strong>Discount:</strong></td>' +
+                '<td><strong>' + (isNaN(discount) ? 0 : discount) + '</strong></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td colspan="3"><strong>Paid:</strong></td>' +
+                '<td><strong>' + (isNaN(total) ? total : total.toFixed(2)) + '</strong></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td colspan="2"><strong>Deceased Name:</strong></td>' +
+                '<td><strong>' + name + '</strong></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td colspan="2"><strong>Payment Mode:</strong></td>' +
+                '<td><strong>' + mode + '</strong></td>' +
+                '</tr>' +
+                '</tbody>' +
+                '</table>';
 
 
-        // Display the table as a receipt
-        var receipt = document.createElement('div');
-        receipt.innerHTML = table;
-        // document.getElementById('rcp').appendChild(receipt);
-          const printWindow = window.open('', 'Print Receipt');
-        printWindow.document.write(receipt.innerHTML);
-         printWindow.document.close();
-        // Print the receipt
-        printWindow.print();
-    }
-
-</script>
+            // Display the table as a receipt
+            var receipt = document.createElement('div');
+            receipt.innerHTML = table;
+            // document.getElementById('rcp').appendChild(receipt);
+            const printWindow = window.open('', 'Print Receipt');
+            printWindow.document.write(receipt.innerHTML);
+            printWindow.document.close();
+            // Print the receipt
+            printWindow.print();
+        }
+    </script>
 @endsection
 @endsection

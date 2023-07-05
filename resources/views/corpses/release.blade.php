@@ -59,7 +59,7 @@
                                  <div class="d-flex justify-content-around align-items-center bg-secondary">
                                         <div class="col">
                                           <p class="font-weight-bold" >Amount Paid:</p>
-                                        <p class="font-weight-bold" > N {{ number_format($data->amount?? 0,2) }}</p>
+                                        <p class="font-weight-bold" > N {{ number_format($data->amount_paid ?? 0,2) }}  {{ $data->discount? '| Discount : '. 'N' .number_format($data->discount,0,2): '' }} </p>
                                       </div>
                                       <div class="col">
                                           <p class="font-weight-bold">Due today:</p>
