@@ -55,7 +55,8 @@ class CadaverController extends Controller
 
                 return response()->json(['success' => 'Added Successfully', 'data' => $saved], 200);
                 // return redirect()->route('corpses')->with('success', 'Added Successfully');
-            } catch (\Throwable $th) {
+            } catch (\Exception $e) {
+                info('admit error', $e);
                 return response()->json(['error' => 'An error occurred, Please try again', 'data' => 'no data'], 500);
                 // session()->flashInput($request->except('death_cert'));
                 // return back()->with('error', 'An error occurred, Please try again');
@@ -283,6 +284,7 @@ class CadaverController extends Controller
         $data_arr = array();
         $view_route = route('get_corpse');
         $release_route = route('release');
+        $delete_route = route('release');
         foreach ($records as $key => $record) {
 
             $id = $record->id;
@@ -304,9 +306,11 @@ class CadaverController extends Controller
                 "date_to" => $date_to,
                 "rack" => $rack,
                 "action" => '<div class="d-flex justify-content-center">
-                                            <a class="btn btn-primary m-2" href=' . $view_route . '?id=' . base64_encode($id) . '> <i class="fa fa-eye"></i> View </a>
-                                            <a class="btn btn-success m-2" href=' . $release_route . '?id=' . base64_encode($id) . '> <i class="fa fa-sign-out-alt"></i> Release</a>
-                                 </div>',
+                    <a class="btn btn-primary m-2" href=' . $view_route . '?id=' . base64_encode($id) . '> <i class="fa fa-eye"></i> View </a>
+                    <a class="btn btn-success m-2" href=' . $release_route . '?id=' . base64_encode($id) . '> <i class="fa fa-sign-out-alt"></i> Release</a>'
+                . (Auth::user() && session()->get('user_type') == 'admin' ?
+                    '<a class="btn btn-danger m-2" onclick="deleteConfirm(\'' . $id . '\',\'' . $name . '\')"> <i class="fa fa-trash"></i> Delete</a>' : '')
+                . '</div>',
             );
         }
 
@@ -339,6 +343,7 @@ class CadaverController extends Controller
     {
         if ($request->id) {
             $corpse = Corpse::find(base64_decode($request->id));
+            // dd($corpse);
             if($request->isMethod('POST')){
                 $corpse = Corpse::find($request->id);
                 try{
@@ -352,6 +357,33 @@ class CadaverController extends Controller
             return view('corpses.edit', ['data' => $corpse]);
         } else {
             return back()->withErrors('Something went wrong..!');
+        }
+    }
+
+    public function delete_corpse(Request $request){
+        if($request->id){
+            $delete =  Corpse::find($request->id);
+            if($delete){
+                // try{
+                    // Payment 
+                    DB::table('payments')->where('corpse_id', $delete->id)->delete();
+                    // Refferal
+                    DB::table('referral_details')->where('corpse_id', $delete->id)->delete();
+                    // Files
+                    DB::table('file_uploads')->where('corpse_id', $delete->id)->delete();
+                    // Update rack
+                    DB::table('racks')->where('id', $delete->rack_id)->update([
+                        'status' => 'available'
+                    ]);
+                    // Corpse
+                    $delete->delete();
+                    return response()->json(['success','Deleted Successfully'],200);
+                // } catch (\Exception $e) {
+                //     return  response()->json([ 'error','An error occurred'],404);
+                // }
+            }else{
+                return response()->json([ 'error','Something went wrong..!'],404);
+            }
         }
     }
 
@@ -403,6 +435,7 @@ class CadaverController extends Controller
             $corpse_amount = $corpse->amount_paid + $corpse->discount + $corpse->affixed_bill;
             $release = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0 & $file_message == 'no' & $due_today == 0 ? 'yes' : 'no';
             $release1 = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0  & $due_today == 0 ? 'yes' : 'no';
+            // dd($payment,+$corpse_amount,$due_today,$corpse->discount);
             // dd($release1);
             return view(
                 'corpses.release',

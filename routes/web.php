@@ -60,6 +60,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('/get_release_list', [CadaverController::class, 'get_release_list'])->name('get_release_list');
     Route::get('/view_by_due_and_to_be_collected_this_month', [CadaverController::class, 'view_by_due_and_to_be_collected_this_month'])->name('view_by_due_and_to_be_collected_this_month');
     Route::get('/get_view_by_due_and_to_be_collected_this_month', [CadaverController::class, 'get_view_by_due_and_to_be_collected_this_month'])->name('get_view_by_due_and_to_be_collected_this_month');
+    Route::delete('/delete_corpse', [CadaverController::class, 'delete_corpse'])->name('delete_corpse');
 
     // Racks
     Route::match(['GET', 'POST'], '/racks', [RackController::class, 'racks'])->name('racks');

@@ -1091,6 +1091,7 @@
             // let bill = $('#affix_amount').val();
             var discount = parseFloat($('#discount').val());
             let bill = parseFloat($('#affix_amount').val());
+            let amount_paid = parseFloat($('#amount_paid').val());
             var affix_desc = $('#desc').val();
             var limitedDesc = affix_desc?.substring(0, 18);
             if (affix_desc?.length > 15) {
@@ -1172,7 +1173,7 @@
                 '</tr>' +
                 '<tr>' +
                 '<td colspan="3"><strong>Paid:</strong></td>' +
-                '<td><strong>' + (isNaN(total) ? total : total.toFixed(2)) + '</strong></td>' +
+                '<td><strong>' + (isNaN(amount_paid) ? amount_paid : amount_paid.toFixed(2)) + '</strong></td>' +
                 '</tr>' +
                 '<tr>' +
                 '<td colspan="2"><strong>Deceased Name:</strong></td>' +

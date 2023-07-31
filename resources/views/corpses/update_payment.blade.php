@@ -535,79 +535,195 @@
         $('#total_amount').val('5000');
     }
 
-    function generateReceipt() {
-        // Get all selected fees
-        var fees = document.querySelectorAll('input[name="fee[]"]:checked');
-        var name = $('#name').val();
-        var mode = $('#mode').val().toUpperCase();
+    // function generateReceipt() {
+    //     // Get all selected fees
+    //     var fees = document.querySelectorAll('input[name="fee[]"]:checked');
+    //     var name = $('#name').val();
+    //     var mode = $('#mode').val().toUpperCase();
 
-        // receipt no
-        // Generate a random 6-digit number
-        const randomNumber = Math.floor(Math.random() * 900000) + 100000;
-        // Get the current timestamp in milliseconds
-        const timestamp = Date.now();
-        // Combine the random number and timestamp to create the receipt number
-        const receiptNumber = `#REC-${randomNumber}-${timestamp}`;
+    //     // receipt no
+    //     // Generate a random 6-digit number
+    //     const randomNumber = Math.floor(Math.random() * 900000) + 100000;
+    //     // Get the current timestamp in milliseconds
+    //     const timestamp = Date.now();
+    //     // Combine the random number and timestamp to create the receipt number
+    //     const receiptNumber = `#REC-${randomNumber}-${timestamp}`;
 
-        // Create a table to display the receipt
-        var table = '<table>' +
-            ' <caption>Payment Update</caption>'+
-            '<thead>' +
-            `<tr> ${receiptNumber} </tr>` +
-            '<tr>' +
-            '<th>Fee</th>' +
-            '<th>Amount</th>' +
-            '<th>Units</th>' +
-            '<th>Subtotal</th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody>';
+    //     // Create a table to display the receipt
+    //     var table = '<table>' +
+    //         ' <caption>Payment Update</caption>'+
+    //         '<thead>' +
+    //         `<tr> ${receiptNumber} </tr>` +
+    //         '<tr>' +
+    //         '<th>Fee</th>' +
+    //         '<th>Amount</th>' +
+    //         '<th>Units</th>' +
+    //         '<th>Subtotal</th>' +
+    //         '</tr>' +
+    //         '</thead>' +
+    //         '<tbody>';
 
-        // Loop through each selected fee and calculate subtotal
-        var totalAmount = 0;
-        fees.forEach(function(fee) {
-            var amount = parseFloat(fee.dataset.amount);
-            var units = parseInt(fee.parentNode.parentNode.parentNode.querySelector('.unit-fee').value);
-            var subtotal = amount * units;
-            totalAmount += subtotal;
+    //     // Loop through each selected fee and calculate subtotal
+    //     var totalAmount = 0;
+    //     fees.forEach(function(fee) {
+    //         var amount = parseFloat(fee.dataset.amount);
+    //         var units = parseInt(fee.parentNode.parentNode.parentNode.querySelector('.unit-fee').value);
+    //         var subtotal = amount * units;
+    //         totalAmount += subtotal;
 
-            // Add fee details to the table
-            table += '<tr>' +
-                '<td>' + fee.parentNode.parentNode.parentNode.querySelector('td:first-child').textContent +
-                '</td>' +
-                '<td>' + amount.toFixed(2) + '</td>' +
-                '<td>' + units + '</td>' +
-                '<td>' + subtotal.toFixed(2) + '</td>' +
-                '</tr>';
-        });
+    //         // Add fee details to the table
+    //         table += '<tr>' +
+    //             '<td>' + fee.parentNode.parentNode.parentNode.querySelector('td:first-child').textContent +
+    //             '</td>' +
+    //             '<td>' + amount.toFixed(2) + '</td>' +
+    //             '<td>' + units + '</td>' +
+    //             '<td>' + subtotal.toFixed(2) + '</td>' +
+    //             '</tr>';
+    //     });
 
-        // Add total amount to the table
-        table += '<tr>' +
-            '<td colspan="3"><strong>Total:</strong></td>' +
-            '<td><strong>' + totalAmount.toFixed(2) + '</strong></td>' +
-            '</tr>' +
-            '<tr>' +
-            '<td colspan="2"><strong>Deceased Name:</strong></td>' +
-            '<td><strong>' + name + '</strong></td>' +
-            '</tr>' +
-            '<tr>' +
-            '<td colspan="2"><strong>Payment Mode:</strong></td>' +
-            '<td><strong>' + mode + '</strong></td>' +
-            '</tr>' +
-            '</tbody>' +
-            '</table>';
+    //     // Add total amount to the table
+    //     table += '<tr>' +
+    //         '<td colspan="3"><strong>Total:</strong></td>' +
+    //         '<td><strong>' + totalAmount.toFixed(2) + '</strong></td>' +
+    //         '</tr>' +
+    //         '<tr>' +
+    //         '<td colspan="2"><strong>Deceased Name:</strong></td>' +
+    //         '<td><strong>' + name + '</strong></td>' +
+    //         '</tr>' +
+    //         '<tr>' +
+    //         '<td colspan="2"><strong>Payment Mode:</strong></td>' +
+    //         '<td><strong>' + mode + '</strong></td>' +
+    //         '</tr>' +
+    //         '</tbody>' +
+    //         '</table>';
 
 
-        // Display the table as a receipt
-        var receipt = document.createElement('div');
-        receipt.innerHTML = table;
-        // document.getElementById('rcp').appendChild(receipt);
-        const printWindow = window.open('', 'Print Receipt');
-        printWindow.document.write(receipt.innerHTML);
-        printWindow.document.close();
-        // Print the receipt
-        printWindow.print();
-    }
+    //     // Display the table as a receipt
+    //     var receipt = document.createElement('div');
+    //     receipt.innerHTML = table;
+    //     // document.getElementById('rcp').appendChild(receipt);
+    //     const printWindow = window.open('', 'Print Receipt');
+    //     printWindow.document.write(receipt.innerHTML);
+    //     printWindow.document.close();
+    //     // Print the receipt
+    //     printWindow.print();
+    // }
+
+       function generateReceipt() {
+            // Get all selected fees
+            var fees = document.querySelectorAll('input[name="fee[]"]:checked');
+            var name = $('#name').val();
+            var mode = $('#mode').val().toUpperCase();
+            // var discount = $('#discount').val();
+            // let bill = $('#affix_amount').val();
+            var discount = parseFloat($('#discount').val());
+            let bill = parseFloat($('#affix_amount').val());
+            let amount_paid = parseFloat($('#amount_paid').val());
+            var affix_desc = $('#desc').val();
+            var limitedDesc = affix_desc?.substring(0, 18);
+            if (affix_desc?.length > 15) {
+            limitedDesc +="...";
+            }
+
+            // receipt no
+            // Generate a random 6-digit number
+            const randomNumber = Math.floor(Math.random() * 900000) + 100000;
+            // Get the current timestamp in milliseconds
+            const timestamp = Date.now();
+            // Combine the random number and timestamp to create the receipt number
+            const receiptNumber = `#REC-${randomNumber}-${timestamp}`;
+            const today = new Date();
+            const day = today.getDate();
+            const month = today.getMonth() + 1; // Months are zero-indexed, so January is 0
+            const year = today.getFullYear();
+            const hours = today.getHours();
+            const minutes = today.getMinutes();
+            const seconds = today.getSeconds();
+
+            const formattedDate = `${day}/${month}/${year}`;
+            const formattedTime = `${hours}:${minutes}:${seconds}`;
+            // Create a table to display the receipt
+            var table = '<table>' +
+                '<thead>' +
+                `<tr> MMC MORTUARY AND FUNERAL HOME </tr> <br>` +
+                `<tr><small>30/32 ADENLE STREET, OFF ALFA NLA ROAD, OKE-KOTO, AGEGE, LAGOS</small>  </tr><br>` +
+                `<tr> ${`${formattedDate}, ${formattedTime}`} </tr> <br>` +
+                `<tr> ${receiptNumber} </tr> <br>` +
+                '<hr>' +
+                '<tr>' +
+                '<th>Fee</th>' +
+                '<th>Units</th>' +
+                '<th>Amount</th>' +
+                '<th>Subtotal</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+
+            // Loop through each selected fee and calculate subtotal
+            var totalAmount = 0;
+            fees.forEach(function(fee) {
+                var amount = parseFloat(fee.dataset.amount);
+                var units = parseInt(fee.parentNode.parentNode.parentNode.querySelector('.unit-fee').value);
+                var subtotal = amount * units;
+                totalAmount += subtotal;
+
+                // Add fee details to the table
+                table += '<tr>' +
+                    '<td>' + fee.parentNode.parentNode.parentNode.querySelector('td:first-child').textContent +
+                    '</td>' +
+                    '<td>' + units + '</td>' +
+                    '<td>' + amount.toFixed(2) + '</td>' +
+                    '<td>' + subtotal.toFixed(2) + '</td>' +
+                    '</tr>';
+            });
+
+          
+              // Calculate the total amount including affixed bill
+                totalAmount += isNaN(bill) ? 0 : bill;
+
+                // Calculate the total amount after applying discount
+                let total = totalAmount - (isNaN(discount) ? 0 : discount);
+              table +=
+                (bill ? '<tr>' +
+                    '<td>Affixed:</td>' +
+                    '<td colspan="2">' + limitedDesc + '</td>' +
+                    '<td>' + bill + '</td>' +
+                    '</tr>' : '') +
+                '<hr>' +
+                '<tr>' +
+                '<td colspan="3"><strong>Total:</strong></td>' +
+                '<td><strong>' + (isNaN(totalAmount) ? totalAmount : totalAmount.toFixed(2)) + '</strong></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td colspan="3"><strong>Discount:</strong></td>' +
+                '<td><strong>' + (isNaN(discount) ? 0 : discount) + '</strong></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td colspan="3"><strong>Paid:</strong></td>' +
+                '<td><strong>' + (isNaN(amount_paid) ? amount_paid : amount_paid.toFixed(2)) + '</strong></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td colspan="2"><strong>Deceased Name:</strong></td>' +
+                '<td><strong>' + name + '</strong></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td colspan="2"><strong>Payment Mode:</strong></td>' +
+                '<td><strong>' + mode + '</strong></td>' +
+                '</tr>' +
+                '</tbody>' +
+                '</table>';
+
+
+            // Display the table as a receipt
+            var receipt = document.createElement('div');
+            receipt.innerHTML = table;
+            // document.getElementById('rcp').appendChild(receipt);
+            const printWindow = window.open('', 'Print Receipt');
+            printWindow.document.write(receipt.innerHTML);
+            printWindow.document.close();
+            // Print the receipt
+            printWindow.print();
+        }
 
 </script>
 @endsection

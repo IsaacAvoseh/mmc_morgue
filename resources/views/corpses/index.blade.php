@@ -201,30 +201,42 @@
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                confirm('Are you sure ?')
                 $.ajax({
-                    url: "{{ route('corpses') }}",
+                    url: "{{ route('delete_corpse') }}",
                     type: 'DELETE',
                     data: {
                         _token: "{{ csrf_token() }}",
                         id: id
                     },
                     success: function(result) {
+                        console.log(result)
                         Swal.fire(
                             'Deleted!',
-                            `${result?.success}.`,
+                            `${result[1]}.`,
                             'success'
                         )
                         location.reload();
                     },
+                    
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(XMLHttpRequest);
+                    if (XMLHttpRequest.responseJSON.error) {
                         Swal.fire(
-                            'Error Deleting !',
-                            `${XMLHttpRequest.responseJSON.error}.`,
+                            'Error !',
+                            `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!'}.`,
                             'error'
                         )
-                        console.log(XMLHttpRequest, textStatus, errorThrown);
+                    } else {
+                        $.each(XMLHttpRequest.responseJSON.errors, function(key, value) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: value[0],
+                            });
+                        });
                     }
+
+                }
                 });
             }
         })
