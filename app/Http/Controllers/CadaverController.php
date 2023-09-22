@@ -54,12 +54,11 @@ class CadaverController extends Controller
                 }
 
                 return response()->json(['success' => 'Added Successfully', 'data' => $saved], 200);
-                // return redirect()->route('corpses')->with('success', 'Added Successfully');
+               
             } catch (\Exception $e) {
                 info('admit error', $e);
                 return response()->json(['error' => 'An error occurred, Please try again', 'data' => 'no data'], 500);
-                // session()->flashInput($request->except('death_cert'));
-                // return back()->with('error', 'An error occurred, Please try again');
+               
             }
         }
 
@@ -115,10 +114,10 @@ class CadaverController extends Controller
 
                 try {
                     // loop through the files in the request
+                    $index = 0;
                     foreach ($data as $key => $file) {
                         // create a unique filename for the file
                         $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-
                         // resize the image or keep the file as is
                         if (in_array($file->getClientOriginalExtension(), ['png', 'jpg', 'jpeg'])) {
                             // resize the image using the Intervention Image library
@@ -138,10 +137,11 @@ class CadaverController extends Controller
                         $fileModel->corpse_id = $admissionId;
                         $fileModel->filename = $filename;
                         $fileModel->user_id = auth()->user()->id;
-                        $fileModel->document_id = $request->document_id[(int)str_replace('document_', '', $key) - 1];
+                        $fileModel->document_id = $request->document_id[$index];
                         // dd($fileModel);
                         $fileModel->path = $folderName . '/' . $filename;
                         $fileModel->save();
+                        $index++;
                     }
                     // return a success response
                     return response()->json(['success' => 'Files uploaded successfully.'], 201);
@@ -159,24 +159,23 @@ class CadaverController extends Controller
 
     public function with_payment(Request $request)
     {
-
+        // dd($request->all());
         if ($request->isMethod('POST')) {
             $request->validate([
                 'admission_id' => 'required',
-                // 'date_from' => 'required',
-                'date_to' => 'required',
+                'date_from' => 'required',
+                // 'date_to' => 'required',
                 'total_amount' => 'required',
-                'no_of_days' => 'required',
+                // 'no_of_days' => 'required',
                 'mode' => 'required',
-            ], ['mode.required' => 'Please select a payment mode', 'admission_id.required' => 'Error !']);
+            ], ['mode.required' => 'Please select a payment mode', 'admission_id.required' => 'Error !', 'date_from' => 'Please select a start date']);
 
-           if($request->date_from){
+           if($request->date_from && $request->date_to){
                 $dateFrom = Carbon::parse($request->date_from);
                 $dateTo = Carbon::parse($request->date_to);
                 $noOfDays = $request->no_of_days;
                 $daysDiff = $dateTo->diffInDays($dateFrom);
-                // dd($daysDiff);
-
+                
                 if ($daysDiff != $noOfDays) {
                     return response()->json(['error' => 'Start and End date selected does not match number of days. Please check your input'], 500);
                 }
@@ -185,6 +184,7 @@ class CadaverController extends Controller
             $corpse = Corpse::find($request->admission_id);
 
             try {
+                DB::beginTransaction();
                 $corpse->update([
                     'date_from' => $request->date_from,
                     'date_to' => $request->date_to,
@@ -194,33 +194,83 @@ class CadaverController extends Controller
                     'no_of_days' => $corpse->no_of_days + $request->no_of_days,
                     'paid' => 'yes'
                 ]);
+
+
                 $unit = count($request->unit_fee);
+                // Loop through the fees and create/update payment records
                 for ($i = 0; $i < $unit; $i++) {
-                    $pay = new Payment();
-                    $pay->qty = $request->unit_fee[$i];
-                    $pay->service_id = $request->fee[$i];
-                    $pay->price = $request->price[$i];
-                    $pay->status = 'success';
-                    $pay->mode = $request->mode;
-                    $pay->corpse_id = $request->admission_id;
-                    $pay->user_id = auth()->user()->id;
-                    $pay->save();
+                    $feeId = $request->fee[$i];
+                    $price = $request->price[$i];
+                    $qty = $request->unit_fee[$i];
+                    $amount = $price * $qty;
+                    // Check if a payment record already exists for this fee and corpse
+                    $payment = Payment::where('corpse_id', $corpse->id)
+                    ->where('service_id', $feeId)
+                    ->first();
+
+                    if ($payment) {
+                        // If a payment record exists, update it
+                        $payment->update([
+                            'qty' => $qty,
+                            'price' => $price,
+                            'status' => 'success',
+                            'mode' => $request->mode,
+                            'amount' => $payment->amount + $amount,
+                            'user_id' => auth()->user()->id,
+                        ]);
+                    } else {
+                        // If no payment record exists, create a new one
+                        Payment::create([
+                            'qty' => $qty,
+                            'service_id' => $feeId,
+                            'price' => $price,
+                            'status' => 'success',
+                            'mode' => $request->mode,
+                            'amount' => $amount,
+                            'corpse_id' => $corpse->id,
+                            'user_id' => auth()->user()->id,
+                        ]);
+                    }
                 }
+                DB::commit();
                 // if($request->wantsJson()){
-                return response()->json(['success' => 'Payment updated Successfully.'], 201);
+                return response()->json(['success' => 'Payment updated Successfully.', 'corpse_id' => $corpse->id, 'service_id' => $request->fee ], 201);
                 // }else{
                 return redirect()->route('corpses')->with('success', 'Payment updated Successfully');
                 // }
             } catch (\Throwable $th) {
-                if ($request->wantsJson()) {
+                DB::rollBack();
+                // if ($request->wantsJson()) {
                     return response()->json(['error' => 'An error occurred, please try again later.'], 500);
-                } else {
-                    return response()->json(['error' => 'An error occurred, please try again later.'], 500);
+                // } else {
                     return redirect()->route('corpses')->with('error', 'An error occurred, please try again later');
-                }
+                // }
             }
         }
     }
+
+    public function update_receipt_numbers(Request $request)
+    {
+        // dd($request->all());
+        $corpse_id = $request->input('corpse_id');
+        $payments = Payment::where('corpse_id', $corpse_id)->whereIn('service_id', $request->input('service_id'))->get();
+        $newReceiptNumber = $request->input('receipt_number');
+
+        foreach ($payments as $payment) {
+            $receiptNumbersString = $payment->receipt_numbers ?? '[]'; // Default to an empty array if it's not set
+            $receiptNumbers = json_decode($receiptNumbersString, true); // Decode the JSON string into an array
+            $receiptNumbers[] = $newReceiptNumber; // Append the new receipt number
+            $updatedReceiptNumbersString = json_encode($receiptNumbers); // Encode the array back into a JSON string
+
+            $payment->update([
+                'receipt_numbers' => $updatedReceiptNumbersString,
+            ]);
+
+        }
+        info('receipt_number'.$corpse_id, ['newReceiptNumber' => $newReceiptNumber]);
+        return response()->json(['receipt_number' => $newReceiptNumber, 'success' => 'Receipt number updated successfully.' ], 201);
+    }
+
 
     public function update_payment(Request $request){
         // dd($request->all());
@@ -233,7 +283,19 @@ class CadaverController extends Controller
             $release1 = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 ? 'yes' : 'no';
 
             $fees = Service::latest()->get();
-
+            $origina_daily_fee = Service::where('name', 'Daily Fee')->pluck('price')[0];
+            $daily_fee = Payment::with('service')->where('corpse_id', $corpse->id)->whereHas('service', function ($query) {
+                $query->where('name', 'Daily Fee');
+            })->pluck('price')[0] ?? $origina_daily_fee;
+         
+            $fees = $fees->map(function ($fee) use ($daily_fee) {
+                // Check if the fee is the "Daily Fee" and update its price
+                if ($fee->name === 'Daily Fee') {
+                    $fee->price = $daily_fee;
+                }
+                return $fee;
+            });
+            session()->flash('ref_corpse_id', $corpse->id);
             return view('corpses.update_payment', [
                 'fees' => $fees,
                 'data' => $corpse,
@@ -393,8 +455,7 @@ class CadaverController extends Controller
         if ($request->id) {
             //   Check payment
             $corpse = Corpse::find(base64_decode($request->id));
-            $payment = DB::table('payments')->where('corpse_id', $corpse->id)->where('status', 'success')->sum(DB::raw('price * qty'));
-
+            $payment = DB::table('payments')->where('corpse_id', $corpse->id)->where('status', 'success')->sum('amount');
             // Check if all required files has been uploaded
             // Get the required document IDs
             $file_message = 'no';
@@ -419,24 +480,33 @@ class CadaverController extends Controller
             }
 
             $due_today = 0;
-            $embalmment_fee = Service::where('name', 'Embalmment')->pluck('price')[0];
-            $daily_fee = Service::where('name', 'Daily Fee')->pluck('price')[0];
-            $date_to = Carbon::parse($corpse->date_to);
-            // dd($daily_fee);
-            $days_diff = $date_to->diffInDays(now());
+            $advance = 0;
+
+            $origina_daily_fee = Service::where('name', 'Daily Fee')->pluck('price')[0];
+            $daily_fee = Payment::with('service')->where('corpse_id', $corpse->id)->whereHas('service', function ($query) { $query->where('name', 'Daily Fee');})->pluck('price')[0]?? $origina_daily_fee;
+            $daily_fee_paid = Payment::with('service')->where('corpse_id', $corpse->id)->whereHas('service', function ($query) { $query->where('name', 'Daily Fee');})->pluck('amount')[0]?? 0;
+
+            // dd($daily_fee_paid);
+            $date_from = Carbon::parse($corpse->date_from);
+            $date_received = Carbon::parse($corpse->date_received);
+            $optional_from_date_received = $date_received->diffInDays(now());
+
+
+            $days_diff = $date_from->diffInDays(now());
             // dd($days_diff);
-            if($days_diff > 0 & $date_to < now()){
-                // $due_today = ($daily_fee*$days_diff) + $embalmment_fee;
-                $due_today = ($daily_fee * $days_diff);
+            if($days_diff > 0 & $date_from < now()){
+                $due_today = ($daily_fee * $days_diff) - $daily_fee_paid;
+                $due_today = $due_today > 0 ? $due_today : ($due_today < 0 ? $due_today : 0) ;
+                $advance = $due_today < 0 ? $due_today : 0;
             }
 
-            // dd($corpse->date_to, $days_diff, $due_today);
-            // $payment = $payment;
-            $corpse_amount = $corpse->amount_paid + $corpse->discount + $corpse->affixed_bill;
-            $release = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0 & $file_message == 'no' & $due_today == 0 ? 'yes' : 'no';
-            $release1 = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0  & $due_today == 0 ? 'yes' : 'no';
-            // dd($payment,+$corpse_amount,$due_today,$corpse->discount);
-            // dd($release1);
+            // $corpse_amount = $corpse->amount_paid + $corpse->discount + $corpse->affixed_bill;
+            // dd($payment, $corpse_amount);
+            $release = $corpse->amount_paid != 0 & $file_message == 'no' & $due_today <= 0 ? 'yes' : 'no';
+            $release1 = $corpse->amount_paid != 0  & $due_today <= 0 ? 'yes' : 'no';
+          
+            $corpse_payment = Payment::with('service')->where('corpse_id', $corpse->id)->where('status', 'success')->get();
+        
             return view(
                 'corpses.release',
                 [
@@ -445,12 +515,15 @@ class CadaverController extends Controller
                     'file_message' => $file_message,
                     'payment_message' => $release1 == 'no' ? 'You need to make payment or pay due fees before releasing this corpse.' : 'no',
                     'due_today' => $due_today,
+                    'advance' => $advance,
+                    'corpse_payment' => $corpse_payment,
+                    'days_diff' => $days_diff,
+                    'daily_fee' => number_format($daily_fee?? 0, 2),
+                    'optional_from_date_received' => $optional_from_date_received,
                 ]
             );
         }
-        // else {
-        //     return back()->withErrors('Something went wrong!');
-        // }
+       
 
         // handle release form
         if ($request->isMethod('POST')) {
@@ -461,31 +534,26 @@ class CadaverController extends Controller
             ]);
 
             $data =  $request->except(['_token', 'rack_id', 'name', 'date_admit', 'address', 'age', 'date']);
+            $data['user_id'] = Auth::user()->id;
             try {
                 $release = new Release();
                 $corpse = Corpse::find($request->corpse_id);
                 $rack = Rack::find($request->rack_id);
 
-                // update corpse status
-                // if ($corpse->status != 'admitted') {
-                //     return back()->with('error', 'An error occurred, Please try again');
-                // } else {
+                DB::beginTransaction();
                 $corpse->update([
                     'status' => 'released'
                 ]);
-                // }
-
-                // update rack status
-                // if ($rack->status != 'used') {
-                //     return back()->with('error', 'An error occurred, Please try again');
-                // } else {
+               
                 $rack->update([
                     'status' => 'available'
                 ]);
-                // }
+                
                 $saved = $release->create($data);
+                DB::commit();
                 return response()->json(['success' => 'Released Successfully', 'data' => $saved], 200);
             } catch (\Throwable $th) {
+                DB::rollBack();
                 return response()->json(['error' => 'An error occurred, Please try again', 'error_data' => $th], 500);
             }
         }
@@ -623,11 +691,10 @@ class CadaverController extends Controller
 
     public function update_before_release(Request $request)
     {
-        // dd($request->all());
         if ($request->id) {
             //   Check payment
             $corpse = Corpse::find(base64_decode($request->id));
-            $payment = DB::table('payments')->where('corpse_id', $corpse->id)->where('status', 'success')->sum(DB::raw('price * qty'));
+            $payment = DB::table('payments')->where('corpse_id', $corpse->id)->where('status', 'success')->sum('amount');
             // Check if all required files has been uploaded
             // Get the required document IDs
             $file_message = 'no';
@@ -651,24 +718,63 @@ class CadaverController extends Controller
                 // All required files have been uploaded
             }
 
-            // $release = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 & $file_message == 'no' ? 'yes' : 'no';
-            // $release1 = $payment == $corpse->amount & $payment != 0 & $corpse->amount != 0 ? 'yes' : 'no';
-            $corpse_amount = $corpse->amount_paid + $corpse->discount + $corpse->affixed_bill;
-            $release = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0 & $file_message == 'no' ? 'yes' : 'no';
-            $release1 = $payment == $corpse_amount & $payment != 0 & $corpse->amount_paid != 0  ? 'yes' : 'no';
+            $due_today = 0;
+            $advance = 0;
 
-            // dd($release);
+            $origina_daily_fee = Service::where('name', 'Daily Fee')->pluck('price')[0];
+            $daily_fee = Payment::with('service')->where('corpse_id', $corpse->id)->whereHas('service', function ($query) {
+                $query->where('name', 'Daily Fee');
+            })->pluck('price')[0] ?? $origina_daily_fee;
+            $daily_fee_paid = Payment::with('service')->where('corpse_id', $corpse->id)->whereHas('service', function ($query) {
+                $query->where('name', 'Daily Fee');
+            })->pluck('amount')[0] ?? 0;
+
+            // dd($daily_fee_paid);
+            $date_from = Carbon::parse($corpse->date_from);
+
+            $days_diff = $date_from->diffInDays(now());
+            // dd($days_diff);
+            if ($days_diff > 0 & $date_from < now()) {
+                $due_today = ($daily_fee * $days_diff) - $daily_fee_paid;
+                $due_today = $due_today > 0 ? $due_today : ($due_today < 0 ? $due_today : 0);
+                $advance = $due_today < 0 ? $due_today : 0;
+            }
+
+            // $corpse_amount = $corpse->amount_paid + $corpse->discount + $corpse->affixed_bill;
+            // dd($payment, $corpse_amount);
+            $release = $corpse->amount_paid != 0 & $file_message == 'no' & $due_today <= 0 ? 'yes' : 'no';
+            $release1 = $corpse->amount_paid != 0  & $due_today <= 0 ? 'yes' : 'no';
+
+            $corpse_payment = Payment::with('service')->where('corpse_id', $corpse->id)->where('status', 'success')->get();
             $files = Document::latest()->get();
             $fees = Service::latest()->get();
+            $daily_fee = Payment::with('service')->where('corpse_id', $corpse->id)->whereHas('service', function ($query) {
+                $query->where('name', 'Daily Fee');
+            })->pluck('price')[0];
 
+            $fees = $fees->map(function ($fee) use ($daily_fee) {
+                // Check if the fee is the "Daily Fee" and update its price
+                if ($fee->name === 'Daily Fee') {
+                    $fee->price = $daily_fee;
+                }
+                return $fee;
+            });
 
+            session()->flash('ref_corpse_id',
+                $corpse->id
+            );
             return view('corpses.update_before_release', [
                 'files' => $files,
                 'fees' => $fees,
                 'data' => $corpse,
                 'release' => $release,
                 'file_message' => $file_message,
-                'payment_message' => $release1 == 'no' ? 'You need to make payment before releasing this corpse.' : 'no',
+                'payment_message' => $release1 == 'no' ? 'You need to make payment or pay due fees before releasing this corpse.' : 'no',
+                'due_today' => $due_today,
+                'advance' => $advance,
+                'corpse_payment' => $corpse_payment,
+                'days_diff' => $days_diff,
+                'daily_fee' => number_format($daily_fee ?? 0, 2)
             ]);
         } else {
             return back()->withErrors('Something went wrong!');

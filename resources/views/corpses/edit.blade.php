@@ -15,6 +15,11 @@
                 <!-- /.modal-dialog -->
                 <div class="card">
                     <div class="card-header">
+                         <div class="align-self-start">
+                            <a class="btn btn-default" href="{{ url()->previous() }}">
+                                <i class="fa fa-arrow-left"></i> Back
+                            </a>
+                        </div>
                         <div class="row justify-content-center">
                             <p class="h5">{{ $data->name?? '-' }}</p>
                         </div>
@@ -331,9 +336,11 @@
 
 
                                 <div class="modal-footer justify-content-between">
-                                    <a href="{{ url()->previous() }}" class="btn btn-default"
-                                        data-dismiss="modal">Back</a>
-                                    {{-- <button type="button" onclick="submitForm()" class="btn btn-primary w-25"> <i class="fa fa-save"></i> Save</button> --}}
+                                    <div class="align-self-start">
+                            <a class="btn btn-default" href="{{ url()->previous() }}">
+                                <i class="fa fa-arrow-left"></i> Back
+                            </a>
+                        </div>
                                     <button type="submit" class="btn btn-primary w-25"> <i class="fa fa-save"></i> Save</button>
                                 </div>
                             </form>

@@ -60,7 +60,7 @@
         <i class="fa fa-plus"></i>
         Affix a bill
     </button>
-    <input type="text" class="form-control border-0 bg-transparent w-25" id="affixed_bill" name="affixed_bill" readonly/>
+    <input type="number" class="form-control border-0 bg-transparent w-25" id="affixed_bill" name="affixed_bill" readonly/>
     <input type="text" hidden class="form-control border-0 bg-transparent form-control-sm" name="desc" />
 </div>
 

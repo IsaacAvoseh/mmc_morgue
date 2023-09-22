@@ -30,6 +30,61 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
+                        
+                        {{-- Update modal --}}
+                <div class="modal fade" id="update_modal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Update</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="overlay-wrapper hidden" id="overlay-wrapper">
+                                    <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                                    </div>
+                                </div>
+                                {{-- end loading spinner --}}
+                                    <input type="hidden" name="id" id="id">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                            <input type="text" name="amount" id="amount"
+                                                value="{{ old('amount') }}" class="form-control datetimepicker-input"
+                                                placeholder="Amount">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Status:</label>
+                                        <div class="input-group date" id="reservationdate"
+                                                data-target-input="nearest">
+                                                <select class="form-control select2bs4 select2-hidden-accessible" name="status" id="status"
+                                                    style="width: 100%;" data-select2-id="17" tabindex="-1"
+                                                    aria-hidden="true">
+                                                    <option selected="selected">Select</option>
+                                                    <option value="paid">Paid</option>
+                                                     <option value="pending">Pending</option>
+                                                </select>
+                                            </div>
+                                    </div>
+                            
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="button" class="btn btn-default"
+                                            data-dismiss="modal">Close</button>
+                                        <button type="button" onclick="single_referral_details_edit()"
+                                            class="btn btn-primary">Submit</button>
+                                    </div>
+                             
+                            </div>
+
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                </div>
+
 
                         <div class="row">
                             <div class="col-md-6">
@@ -38,17 +93,19 @@
                                 <p><strong>Address:</strong> {{ $data->address ?? '-' }}</p>
                             </div>
                             <div class="col-md-6">
-                            
+
                                 <p><strong>Email:</strong> {{ $data->email ?? '-' }}</p>
-                                <p><strong>Referred:</strong> {{ DB::table('referral_details')->where('referral_id', $data->id)->count() ?? '0' }}</p>
+                                <p><strong>Referred:</strong>
+                                    {{ DB::table('referral_details')->where('referral_id', $data->id)->count() ?? '0' }}
+                                </p>
                                 <p><strong>DOB:</strong> {{ $data->dob ?? '-' }}</p>
-                                
-                               
+
+
                             </div>
                         </div>
                         <hr>
                     </div>
-                     <div class="card-body">
+                    <div class="card-body">
                         <p>Referral history</p>
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
@@ -88,18 +145,11 @@
 @section('scripts')
     @parent
     <script>
-        document.addEventListener("DOMContentLoaded", function(event) {
-            document.getElementById('date_from').valueAsDate = new Date();
-        });
-
         function loading() {
             $('.card').find('#overlay-wrapper').css('display', 'block');
         }
 
-        function showPrev() {
-            $('#admission_form').attr('hidden', false);
-            $('#admission_form2').attr('hidden', true);
-        }
+
         // submit form
         function submitForm() {
             // $("#submit_button").click(function(){
@@ -188,46 +238,113 @@
             card.css('display', originalDisplay);
         }
 
-  $("#example1").DataTable({
-                processing: true,
-                serverSide: true,
-                paging: true,
-                ordering: true,
-                pageLength: 10,
-                // responsive: true,
-                info: true,
-                ajax: {
-                    type: "GET",
-                    url: "{{ route('get_referral_details') }}",
-                    dataSrc: function(data) {
-                        return data.aaData
-                    }
+        $("#example1").DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            ordering: true,
+            pageLength: 10,
+            // responsive: true,
+            info: true,
+            ajax: {
+                type: "GET",
+                url: "{{ route('get_referral_details') }}",
+                dataSrc: function(data) {
+                    return data.aaData
+                }
+            },
+            columns: [{
+                    data: 'id',
+
                 },
-                columns: [{
-                        data: 'id',
+                {
+                    data: 'name'
+                },
+                {
+                    data: 'amount'
+                },
 
-                    },
-                    {
-                        data: 'name'
-                    },
-                    {
-                        data: 'amount'
-                    },
-                   
-                    {
-                        data: 'status'
-                    },
-                    {
-                        data: 'date'
-                    },
-                   
-                    {
-                        data: 'action'
-                    },
+                {
+                    data: 'status'
+                },
+                {
+                    data: 'date'
+                },
 
-                ],
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+                {
+                    data: 'action'
+                },
 
+            ],
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+       
+
+        function get_single_referral_details(id) {
+        // open modal and send request to get conference data
+        $('#update_modal').modal('show');
+        $('#update_modal').find('#overlay-wrapper').css('display', 'block');
+        $.ajax({
+            url: "{{ route('get_single_referral_details') }}",
+            type: 'GET',
+            data: {
+                _token: "{{ csrf_token() }}",
+                id: id
+            },
+            success: function(result) {
+                console.log(result);
+                $('#update_modal').find('#overlay-wrapper').css('display', 'none');
+                $('#update_modal').find('#amount').val(result?.data?.amount);
+                 $('#update_modal').find('#status').prepend($("<option selected ></option>")
+                    .attr("value", result?.data?.status)
+                    .text(result?.data?.status)); 
+                $('#update_modal').find('#id').val(result?.data?.id);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                Swal.fire(
+                    'Error!',
+                    'Something went wrong.',
+                    'error'
+                )
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function single_referral_details_edit() {
+
+        $('#update_modal').find('#overlay-wrapper').css('display', 'block');
+        $.ajax({
+            url: "{{ route('single_referral_details_edit') }}",
+            type: 'PUT',
+            data: {
+                _token: "{{ csrf_token() }}",
+                id: $('#update_modal').find('#id').val(),
+                amount: $('#update_modal').find('#amount').val(),
+                status: $('#update_modal').find('#status').val(),
+            },
+            success: function(result) {
+                console.log('resu;t', result);
+                $('#update_modal').find('#overlay-wrapper').css('display', 'none');
+                Swal.fire(
+                    'Success!',
+                    `${result?.success} `,
+                    'success'
+                )
+                location.reload();
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                Swal.fire(
+                    'Error!',
+                    `${XMLHttpRequest.responseJSON.error?XMLHttpRequest.responseJSON.error: 'Something went wrong!' }`,
+                    'error'
+                )
+                $('#update_modal').find('#overlay-wrapper').css('display', 'none');
+                console.log(XMLHttpRequest);
+            }
+        });
+
+    }
     </script>
 @endsection
 @endsection

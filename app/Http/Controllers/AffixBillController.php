@@ -23,6 +23,7 @@ class AffixBillController extends Controller
                 $affix->corpse_id = $corpse->id;
                 // $affix->service_id = 0;
                 $affix->price = $request->affixed_bill;
+                $affix->amount = $request->affixed_bill;
                 $affix->mode = $request->mode;
                 $affix->qty = 1;
                 $affix->status = 'success';

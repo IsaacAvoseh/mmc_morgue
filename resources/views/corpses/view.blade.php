@@ -33,6 +33,7 @@
 
                 {{-- add new modal --}}
                 <div class="card" id="print-card">
+
                     <div class="card-header d-flex flex-wrap justify-content-between bg-light">
                         <div class="align-self-start">
                             <a class="btn btn-default" href="{{ url()->previous() }}">
@@ -48,7 +49,7 @@
                                 <div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
                             </div>
                             {{-- End loading spinner --}}
-                            @include('shared.affix_bill', ['affix_corpse_id' => $data->id])
+                            {{-- @include('shared.affix_bill', ['affix_corpse_id' => $data->id]) --}}
                         </div>
                     </div>
 
@@ -124,24 +125,30 @@
                                         </button>
                                     </div>
                                 </div>
-                                {{-- <a class="btn btn-default" href="{{route('update_payment', ['id' => base64_encode($data->id)]) }}">Click here to pay</a> --}}
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <a class="btn btn-success m-1 w-100"
+
+                         
+                        </div>
+                        
+                    </div>
+
+                     <div class="col-md-12">
+                            <div class="d-flex justify-content-between align-items-center bg-secondary my-1 p-2">
+                                <a class="btn btn-info m-1 w-100" href="{{ route('update_payment', ['id' => base64_encode($data->id)]) }}">Update Payement</a>
+
+                                 <a class="btn btn-success m-1 w-100"
                                         href="{{ route('release', ['id' => base64_encode($data->id)]) }}"> <i
                                             class="fa fa-sign-out-alt"></i> Release</a>
-                                </div>
-                                <div class="col-md-6">
-                                    <a class="btn btn-primary m-1 w-100"
+
+                                     <a class="btn btn-primary m-1 w-100"
                                         href="{{ route('edit_corpse', ['id' => base64_encode($data->id)]) }}"> <i
                                             class="fa fa-pen"></i> Edit</a>
-                                    <button class="btn btn-secondary w-100" onclick="printCard()"> <i
+
+                                            <button class="btn btn-warning w-100" onclick="printCard()"> <i
                                             class="fa fa-print"></i> Print</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+                             </div>
+                          </div>
                 </div>
             </div>
         </div>

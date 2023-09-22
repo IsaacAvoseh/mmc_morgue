@@ -156,6 +156,7 @@ class ReferralController extends Controller
                 "status" => $status,
                 "date" => $date,
                 "action" => '  <div class="d-flex">
+                                            <a onclick="get_single_referral_details('.$id.')" class="btn btn-warning m-2"> <i class="fa fa-edit text-white"></i> </a>
                                             <a href="' . route('get_corpse', ['id' => base64_encode($record->corpse_id)]) . '" class="btn btn-primary m-2"> <i class="fa fa-eye"></i> </a>
                                  </div>',
             );
@@ -198,6 +199,37 @@ class ReferralController extends Controller
         }catch (\Exception $e){
             return  response()->json(['error' => 'An error occurred, please try again on corpse details page after saving this record'],500 );
         };
+    }
+
+    public function get_single_referral_details(Request $request){
+        if ($request->id) {
+            try {
+                $get_single_referral_details = ReferralDetails::find($request->id);
+                // delay for 1 seconds
+                sleep(0.5);
+                return response()->json(['success' => 'ReferralDetails fetched successfully', 'data' => $get_single_referral_details], 200);
+            } catch (\Throwable $th) {
+                return response()->json(['error' => 'Error fetching '], 500);
+            }
+        } else {
+            return response()->json(['error' => 'Error fetching '], 500);
+        }
+    
+    }
+
+    public function single_referral_details_edit(Request $request)
+    {
+        if ($request->id) {
+            $single_referral_details_edit = ReferralDetails::find($request->id);
+            // abort(500);
+            $single_referral_details_edit->update([
+                'amount' => $request->amount,
+                'status' => $request->status,
+            ]);
+            return response()->json(['success' => 'Updated successfully'], 200);
+        } else {
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
 
     public function get_referral(Request $request){

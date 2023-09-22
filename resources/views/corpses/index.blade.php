@@ -193,7 +193,7 @@
     function deleteConfirm(id, name) {
         Swal.fire({
             title: `Are you sure you want to delete ${name}?`,
-            text: "You won't be able to revert this!",
+            text: `You won't be able to revert this!, This will also remove all payment,referral and uploaded files record for ${name}`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',

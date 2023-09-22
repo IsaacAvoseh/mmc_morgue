@@ -87,6 +87,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::post('/with_payment', [CadaverController::class, 'with_payment'])->name('with_payment');
     Route::get('/without_payment', [CadaverController::class, 'without_payment'])->name('without_payment');
     Route::match(['GET', 'POST'],'/update_payment', [CadaverController::class, 'update_payment'])->name('update_payment');
+    Route::match(['GET', 'POST'],'/update_receipt_numbers', [CadaverController::class, 'update_receipt_numbers'])->name('update_receipt_numbers');
 
     // payment_history
     Route::get('payment_history', [PaymentHistoryController::class, 'index'])->name('payment_history');
@@ -123,7 +124,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('/referral', [ReferralController::class, 'referral'])->name('referral');
     Route::post('/add_ref_details', [ReferralController::class, 'add_ref_details'])->name('add_ref_details');
     Route::get('/get_referral_details', [ReferralController::class, 'get_referral_details'])->name('get_referral_details');
+    Route::get('/get_single_referral_details', [ReferralController::class, 'get_single_referral_details'])->name('get_single_referral_details');
     Route::put('/referral_edit', [ReferralController::class, 'referral_edit'])->name('referral_edit');
+    Route::put('/single_referral_details_edit', [ReferralController::class, 'single_referral_details_edit'])->name('single_referral_details_edit');
 
     // Affix bill
     Route::post('/affix_bill', [AffixBillController::class, 'affix_bill'])->name('affix_bill');

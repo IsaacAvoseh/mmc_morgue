@@ -13,4 +13,7 @@ class Release extends Model
     public function corpse(){
         return $this->belongsTo(Corpse::class);
     }
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }
