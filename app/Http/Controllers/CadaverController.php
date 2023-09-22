@@ -211,7 +211,7 @@ class CadaverController extends Controller
                     if ($payment) {
                         // If a payment record exists, update it
                         $payment->update([
-                            'qty' => $qty,
+                            'qty' => $payment->qty + $qty,
                             'price' => $price,
                             'status' => 'success',
                             'mode' => $request->mode,

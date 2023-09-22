@@ -71,10 +71,10 @@ class PaymentHistoryController extends Controller
         ->get();
 
         $data_arr = array();
-        $cash = Payment::where('mode', 'cash')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum(DB::raw('price * qty'));
-        $transfer = Payment::where('mode', 'tranfer')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum(DB::raw('price * qty'));
-        $pos = Payment::where('mode', 'pos')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum(DB::raw('price * qty'));
-        $others = Payment::where('mode', 'others')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum(DB::raw('price * qty'));
+        $cash = Payment::where('mode', 'cash')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum('amount');
+        $transfer = Payment::where('mode', 'tranfer')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum('amount');
+        $pos = Payment::where('mode', 'pos')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum('amount');
+        $others = Payment::where('mode', 'others')->where('status', 'success')->whereBetween('created_at', [$start_date, $end_date])->sum('amount');
         $total = $cash + $transfer + $pos + $others;
 
         foreach ($records as $key => $record) {
