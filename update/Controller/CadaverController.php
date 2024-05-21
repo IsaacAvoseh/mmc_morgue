@@ -748,7 +748,9 @@ class CadaverController extends Controller
             $corpse_payment = Payment::with('service')->where('corpse_id', $corpse->id)->where('status', 'success')->get();
             $files = Document::latest()->get();
             $fees = Service::latest()->get();
-
+            $daily_fee = Payment::with('service')->where('corpse_id', $corpse->id)->whereHas('service', function ($query) {
+                $query->where('name', 'Daily Fee');
+            })->pluck('price')[0];
 
             $fees = $fees->map(function ($fee) use ($daily_fee) {
                 // Check if the fee is the "Daily Fee" and update its price

@@ -109,17 +109,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::post('/approve_request', [InventoryController::class, 'approve_request'])->name('approve_request');
     Route::post('/reject_request', [InventoryController::class, 'reject_request'])->name('reject_request');
 
-    // Inventory History
+    // Inventory Hostory
     Route::get('/inventory/history', [InventoryHistoyController::class, 'history'])->name('history');
     Route::get('/inventory/get_inventory_history', [InventoryHistoyController::class, 'get_inventory_history'])->name('get_inventory_history');
     Route::get('/inventory/get_expenses', [InventoryHistoyController::class, 'get_expenses'])->name('get_expenses');
     Route::match(['GET', 'POST'],'/inventory/expenses', [InventoryHistoyController::class, 'expenses'])->name('expenses');
     Route::match(['GET', 'POST'],'/inventory/expense_category', [ExpenseCategoryController::class, 'expense_category'])->name('expense_category');
     Route::get('/inventory/get_expense_category', [ExpenseCategoryController::class, 'get_expense_category'])->name('get_expense_category');
-    Route::delete('/inventory/delete_expense_category', [ExpenseCategoryController::class, 'delete_expense_category'])->name('delete_expense_category');
-    Route::delete('/inventory/expense_category_edit', [ExpenseCategoryController::class, 'expense_category_edit'])->name('expense_category_edit');
-    Route::put('/inventory/expense_category_edit', [ExpenseCategoryController::class, 'expense_category_edit'])->name('expense_category_edit');
-    Route::get('/inventory/get_single_expense_category', [ExpenseCategoryController::class, 'get_single_expense_category'])->name('get_single_expense_category');
 
     // Referrals
     Route::match(['GET', 'POST'], '/referrals', [ReferralController::class, 'referrals'])->name('referrals');

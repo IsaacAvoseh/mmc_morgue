@@ -88,7 +88,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label>Status:</label>
+                                        <label>Required ?</label>
                                         <div class="input-group date" id="reservationdate"
                                                 data-target-input="nearest">
                                                 <select class="form-control select2bs4 select2-hidden-accessible" name="status" id="required"

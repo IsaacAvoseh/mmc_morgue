@@ -11,62 +11,6 @@
         </p>
         <div class="row">
             <div class="col-12">
-                {{-- Add new Modal name, start and end date --}}
-                {{-- <div class="modal fade" id="addNewModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title">Add New</h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <p class="text-danger text-bold"> Please type airline correctly or copy and pase from
-                                    payment or billing excel sheet</p>
-                                <form action="{{ route('services') }}" method="POST">
-                                    @csrf
-                                    <div class="form-group">
-                                        <label>Name</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="text" name="name" value="{{ old('name') }}"
-                                                class="form-control datetimepicker-input"
-                                                placeholder="Africa World Services Limited" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Naira Opening Balance:</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="number" step=".01" name="naira_opening" min="0"
-                                                placeholder="18278666.12" value="{{ old('naira_opening') }}"
-                                                class="form-control datetimepicker-input"
-                                                data-target="#reservationdate">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>USD Opening Balance:</label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="number" step=".01" name="usd_opening" min="0"
-                                                placeholder="18278666.12" class="form-control datetimepicker-input"
-                                                value="{{ old('usd_opening') }}" data-target="#reservationdate">
-                                        </div>
-                                    </div>
-
-                                    <div class="modal-footer justify-content-between">
-                                        <button type="button" class="btn btn-default"
-                                            data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
-                                </form>
-                            </div>
-
-                        </div>
-                        <!-- /.modal-content -->
-                    </div>
-                    <!-- /.modal-dialog -->
-                </div> --}}
-
-                {{-- add new modal --}}
 
                 {{-- Update modal --}}
                 <div class="modal fade" id="update_modal">
@@ -85,7 +29,6 @@
                                 </div>
                                 {{-- end loading spinner --}}
                                
-                             
                                     <input type="hidden" name="id" id="id">
                                     <div class="form-group">
                                         <label>Name</label>
@@ -369,6 +312,7 @@
         });
 
     }
+
     function showUpload() {
         if ($('#show_upload').attr('hidden')) {
             $('#show_upload').attr('hidden', false);

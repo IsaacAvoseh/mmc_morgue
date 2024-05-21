@@ -145,7 +145,7 @@ $(function () {
   // })
 
   $.ajax({
-    url: '/chart-data',
+    url: "/mmc_morgue/chart-data",
     type: 'GET',
     dataType: 'json',
     success: function(data) {

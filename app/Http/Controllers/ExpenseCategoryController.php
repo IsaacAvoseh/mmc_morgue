@@ -76,7 +76,7 @@ public function expense_category(Request $request)
                 "date" => $date,
                 
                 "action" => '  <div class="d-flex">
-                            <a class="btn btn-primary m-2" onclick="get_rack(' . $id . ')"> <i class="fa fa-edit"></i> </a>
+                            <a class="btn btn-primary m-2" onclick="get_single_expense_category(' . $id . ')"> <i class="fa fa-edit"></i> </a>
                             <a class="btn btn-danger m-2" onclick="deleteConfirm(' . $id . ',' . "'$name'" .  ')"> <i class="fa fa-trash"></i> </a>
                  </div>',
             );
@@ -91,5 +91,52 @@ public function expense_category(Request $request)
 
         echo json_encode($response);
         exit;
+    }
+
+
+    public function get_single_expense_category(Request $request)
+    {
+        // return json response
+        if ($request->id) {
+            try {
+                $expense_category = ExpenseCategory::find($request->id);
+                // delay for 1 seconds
+                sleep(0.5);
+                return response()->json(['success' => 'ExpenseCategory fetched successfully', 'data' => $expense_category], 200);
+            } catch (\Throwable $th) {
+                return response()->json(['error' => 'Error fetching expenseCategory'], 500);
+            }
+        } else {
+            return response()->json(['error' => 'Error fetching expenseCategory'], 500);
+        }
+    }
+
+    public function expense_category_edit(Request $request)
+    {
+        if ($request->expense_category_id) {
+            $expenseCategory = ExpenseCategory::find($request->expense_category_id);
+            // abort(500);
+            $expenseCategory->update([
+                'name' => $request->name,
+            ]);
+            return response()->json(['success' => 'Updated successfully'], 200);
+        } else {
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
+    }
+
+    public function delete_expense_category(Request $request)
+    {
+        if ($request->id) {
+            try {
+                $expenseCategory = ExpenseCategory::find($request->id);
+                $expenseCategory->delete();
+                return response()->json(['success' => 'ExpenseCategory deleted successfully'], 200);
+            } catch (\Throwable $th) {
+                return response()->json(['error' => 'Error deleting expenseCategory'], 500);
+            }
+        } else {
+            return response()->json(['error' => 'Error deleting expenseCategory'], 500);
+        }
     }
 }

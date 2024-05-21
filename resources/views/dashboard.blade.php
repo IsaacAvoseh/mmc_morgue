@@ -198,7 +198,7 @@
   
 @section('scripts')
     @parent
-     <script src="/plugins/chart.js/Chart.min.js" ></script>
-    <script src="/dist/js/pages/dashboard3.js"></script>
+     <script src="{{ asset('/plugins/chart.js/Chart.min.js') }}" ></script>
+    <script src="{{ asset('/dist/js/pages/dashboard3.js') }}"></script>
 @endsection
 @endsection

@@ -1,6 +1,4 @@
 @extends('layout.main')
-
-
 @section('content')
 @section('title', 'Request List')
 <!-- Main content -->
